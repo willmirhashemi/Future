@@ -1,0 +1,617 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* IdentityCalendarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* IdentityCalendarApp.swift */; };
+		A10000000000000000000002 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* User.swift */; };
+		A10000000000000000000003 /* IdentityGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* IdentityGoal.swift */; };
+		A10000000000000000000004 /* Milestone.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000004 /* Milestone.swift */; };
+		A10000000000000000000005 /* WeeklyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000005 /* WeeklyTheme.swift */; };
+		A10000000000000000000006 /* PlanBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* PlanBlock.swift */; };
+		A10000000000000000000007 /* WeeklyReflection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* WeeklyReflection.swift */; };
+		A10000000000000000000008 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* Subscription.swift */; };
+		A10000000000000000000009 /* AIPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* AIPlannerService.swift */; };
+		A10000000000000000000010 /* MockAIPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000010 /* MockAIPlannerService.swift */; };
+		A10000000000000000000011 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* NotificationService.swift */; };
+		A10000000000000000000012 /* SubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000012 /* SubscriptionService.swift */; };
+		A10000000000000000000013 /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* DataService.swift */; };
+		A10000000000000000000014 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000014 /* OnboardingViewModel.swift */; };
+		A10000000000000000000015 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000015 /* CalendarViewModel.swift */; };
+		A10000000000000000000016 /* ReflectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000016 /* ReflectionViewModel.swift */; };
+		A10000000000000000000017 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* ProgressViewModel.swift */; };
+		A10000000000000000000018 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000018 /* SettingsViewModel.swift */; };
+		A10000000000000000000019 /* PaywallViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* PaywallViewModel.swift */; };
+		A10000000000000000000020 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* Date+Extensions.swift */; };
+		A10000000000000000000021 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000021 /* Color+Extensions.swift */; };
+		A10000000000000000000022 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000022 /* View+Extensions.swift */; };
+		A10000000000000000000023 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000023 /* Constants.swift */; };
+		A10000000000000000000024 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000024 /* Haptics.swift */; };
+		A10000000000000000000025 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* PrimaryButton.swift */; };
+		A10000000000000000000026 /* SelectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000026 /* SelectionCard.swift */; };
+		A10000000000000000000027 /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000027 /* ProgressBar.swift */; };
+		A10000000000000000000028 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000028 /* OnboardingContainerView.swift */; };
+		A10000000000000000000029 /* IdentitySelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000029 /* IdentitySelectionView.swift */; };
+		A10000000000000000000030 /* TimeHorizonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000030 /* TimeHorizonView.swift */; };
+		A10000000000000000000031 /* AvailabilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000031 /* AvailabilityView.swift */; };
+		A10000000000000000000032 /* IntensityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000032 /* IntensityView.swift */; };
+		A10000000000000000000033 /* PlanConfidenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000033 /* PlanConfidenceView.swift */; };
+		A10000000000000000000034 /* PlanGenerationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000034 /* PlanGenerationView.swift */; };
+		A10000000000000000000035 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000035 /* CalendarView.swift */; };
+		A10000000000000000000036 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000036 /* WeekView.swift */; };
+		A10000000000000000000037 /* DayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000037 /* DayView.swift */; };
+		A10000000000000000000038 /* BlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000038 /* BlockView.swift */; };
+		A10000000000000000000039 /* BlockDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000039 /* BlockDetailSheet.swift */; };
+		A10000000000000000000040 /* WeeklyReflectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000040 /* WeeklyReflectionView.swift */; };
+		A10000000000000000000041 /* ProgressTrackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000041 /* ProgressTrackingView.swift */; };
+		A10000000000000000000042 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000042 /* SettingsView.swift */; };
+		A10000000000000000000043 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000043 /* PaywallView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A20000000000000000000000 /* IdentityCalendar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IdentityCalendar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000001 /* IdentityCalendarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityCalendarApp.swift; sourceTree = "<group>"; };
+		A20000000000000000000002 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		A20000000000000000000003 /* IdentityGoal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityGoal.swift; sourceTree = "<group>"; };
+		A20000000000000000000004 /* Milestone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Milestone.swift; sourceTree = "<group>"; };
+		A20000000000000000000005 /* WeeklyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyTheme.swift; sourceTree = "<group>"; };
+		A20000000000000000000006 /* PlanBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanBlock.swift; sourceTree = "<group>"; };
+		A20000000000000000000007 /* WeeklyReflection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReflection.swift; sourceTree = "<group>"; };
+		A20000000000000000000008 /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
+		A20000000000000000000009 /* AIPlannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIPlannerService.swift; sourceTree = "<group>"; };
+		A20000000000000000000010 /* MockAIPlannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAIPlannerService.swift; sourceTree = "<group>"; };
+		A20000000000000000000011 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		A20000000000000000000012 /* SubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionService.swift; sourceTree = "<group>"; };
+		A20000000000000000000013 /* DataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataService.swift; sourceTree = "<group>"; };
+		A20000000000000000000014 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
+		A20000000000000000000015 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
+		A20000000000000000000016 /* ReflectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionViewModel.swift; sourceTree = "<group>"; };
+		A20000000000000000000017 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
+		A20000000000000000000018 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		A20000000000000000000019 /* PaywallViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallViewModel.swift; sourceTree = "<group>"; };
+		A20000000000000000000020 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
+		A20000000000000000000021 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
+		A20000000000000000000022 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
+		A20000000000000000000023 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		A20000000000000000000024 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		A20000000000000000000025 /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
+		A20000000000000000000026 /* SelectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCard.swift; sourceTree = "<group>"; };
+		A20000000000000000000027 /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
+		A20000000000000000000028 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
+		A20000000000000000000029 /* IdentitySelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentitySelectionView.swift; sourceTree = "<group>"; };
+		A20000000000000000000030 /* TimeHorizonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeHorizonView.swift; sourceTree = "<group>"; };
+		A20000000000000000000031 /* AvailabilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailabilityView.swift; sourceTree = "<group>"; };
+		A20000000000000000000032 /* IntensityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntensityView.swift; sourceTree = "<group>"; };
+		A20000000000000000000033 /* PlanConfidenceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanConfidenceView.swift; sourceTree = "<group>"; };
+		A20000000000000000000034 /* PlanGenerationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanGenerationView.swift; sourceTree = "<group>"; };
+		A20000000000000000000035 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
+		A20000000000000000000036 /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekView.swift; sourceTree = "<group>"; };
+		A20000000000000000000037 /* DayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayView.swift; sourceTree = "<group>"; };
+		A20000000000000000000038 /* BlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockView.swift; sourceTree = "<group>"; };
+		A20000000000000000000039 /* BlockDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockDetailSheet.swift; sourceTree = "<group>"; };
+		A20000000000000000000040 /* WeeklyReflectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReflectionView.swift; sourceTree = "<group>"; };
+		A20000000000000000000041 /* ProgressTrackingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressTrackingView.swift; sourceTree = "<group>"; };
+		A20000000000000000000042 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A20000000000000000000043 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		A20000000000000000000044 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A30000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A40000000000000000000000 = {
+			isa = PBXGroup;
+			children = (
+				A40000000000000000000001 /* IdentityCalendar */,
+				A40000000000000000000002 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A40000000000000000000001 /* IdentityCalendar */ = {
+			isa = PBXGroup;
+			children = (
+				A40000000000000000000003 /* App */,
+				A40000000000000000000004 /* Models */,
+				A40000000000000000000005 /* Services */,
+				A40000000000000000000006 /* ViewModels */,
+				A40000000000000000000007 /* Views */,
+				A40000000000000000000008 /* Extensions */,
+				A40000000000000000000009 /* Utilities */,
+				A20000000000000000000044 /* Info.plist */,
+			);
+			path = IdentityCalendar;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000002 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000000 /* IdentityCalendar.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000003 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000001 /* IdentityCalendarApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000004 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000002 /* User.swift */,
+				A20000000000000000000003 /* IdentityGoal.swift */,
+				A20000000000000000000004 /* Milestone.swift */,
+				A20000000000000000000005 /* WeeklyTheme.swift */,
+				A20000000000000000000006 /* PlanBlock.swift */,
+				A20000000000000000000007 /* WeeklyReflection.swift */,
+				A20000000000000000000008 /* Subscription.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000005 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000009 /* AIPlannerService.swift */,
+				A20000000000000000000010 /* MockAIPlannerService.swift */,
+				A20000000000000000000011 /* NotificationService.swift */,
+				A20000000000000000000012 /* SubscriptionService.swift */,
+				A20000000000000000000013 /* DataService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000006 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000014 /* OnboardingViewModel.swift */,
+				A20000000000000000000015 /* CalendarViewModel.swift */,
+				A20000000000000000000016 /* ReflectionViewModel.swift */,
+				A20000000000000000000017 /* ProgressViewModel.swift */,
+				A20000000000000000000018 /* SettingsViewModel.swift */,
+				A20000000000000000000019 /* PaywallViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000007 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A40000000000000000000010 /* Components */,
+				A40000000000000000000011 /* Onboarding */,
+				A40000000000000000000012 /* Calendar */,
+				A40000000000000000000013 /* Reflection */,
+				A40000000000000000000014 /* Progress */,
+				A40000000000000000000015 /* Settings */,
+				A40000000000000000000016 /* Paywall */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000008 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000020 /* Date+Extensions.swift */,
+				A20000000000000000000021 /* Color+Extensions.swift */,
+				A20000000000000000000022 /* View+Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000009 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000023 /* Constants.swift */,
+				A20000000000000000000024 /* Haptics.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000010 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000025 /* PrimaryButton.swift */,
+				A20000000000000000000026 /* SelectionCard.swift */,
+				A20000000000000000000027 /* ProgressBar.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000011 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000028 /* OnboardingContainerView.swift */,
+				A20000000000000000000029 /* IdentitySelectionView.swift */,
+				A20000000000000000000030 /* TimeHorizonView.swift */,
+				A20000000000000000000031 /* AvailabilityView.swift */,
+				A20000000000000000000032 /* IntensityView.swift */,
+				A20000000000000000000033 /* PlanConfidenceView.swift */,
+				A20000000000000000000034 /* PlanGenerationView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000012 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000035 /* CalendarView.swift */,
+				A20000000000000000000036 /* WeekView.swift */,
+				A20000000000000000000037 /* DayView.swift */,
+				A20000000000000000000038 /* BlockView.swift */,
+				A20000000000000000000039 /* BlockDetailSheet.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000013 /* Reflection */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000040 /* WeeklyReflectionView.swift */,
+			);
+			path = Reflection;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000014 /* Progress */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000041 /* ProgressTrackingView.swift */,
+			);
+			path = Progress;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000015 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000042 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000016 /* Paywall */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000043 /* PaywallView.swift */,
+			);
+			path = Paywall;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A50000000000000000000001 /* IdentityCalendar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A60000000000000000000001 /* Build configuration list for PBXNativeTarget "IdentityCalendar" */;
+			buildPhases = (
+				A30000000000000000000000 /* Sources */,
+				A30000000000000000000001 /* Frameworks */,
+				A30000000000000000000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IdentityCalendar;
+			productName = IdentityCalendar;
+			productReference = A20000000000000000000000 /* IdentityCalendar.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A70000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					A50000000000000000000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = A60000000000000000000000 /* Build configuration list for PBXProject "IdentityCalendar" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A40000000000000000000000;
+			productRefGroup = A40000000000000000000002 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A50000000000000000000001 /* IdentityCalendar */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A30000000000000000000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A30000000000000000000000 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* IdentityCalendarApp.swift in Sources */,
+				A10000000000000000000002 /* User.swift in Sources */,
+				A10000000000000000000003 /* IdentityGoal.swift in Sources */,
+				A10000000000000000000004 /* Milestone.swift in Sources */,
+				A10000000000000000000005 /* WeeklyTheme.swift in Sources */,
+				A10000000000000000000006 /* PlanBlock.swift in Sources */,
+				A10000000000000000000007 /* WeeklyReflection.swift in Sources */,
+				A10000000000000000000008 /* Subscription.swift in Sources */,
+				A10000000000000000000009 /* AIPlannerService.swift in Sources */,
+				A10000000000000000000010 /* MockAIPlannerService.swift in Sources */,
+				A10000000000000000000011 /* NotificationService.swift in Sources */,
+				A10000000000000000000012 /* SubscriptionService.swift in Sources */,
+				A10000000000000000000013 /* DataService.swift in Sources */,
+				A10000000000000000000014 /* OnboardingViewModel.swift in Sources */,
+				A10000000000000000000015 /* CalendarViewModel.swift in Sources */,
+				A10000000000000000000016 /* ReflectionViewModel.swift in Sources */,
+				A10000000000000000000017 /* ProgressViewModel.swift in Sources */,
+				A10000000000000000000018 /* SettingsViewModel.swift in Sources */,
+				A10000000000000000000019 /* PaywallViewModel.swift in Sources */,
+				A10000000000000000000020 /* Date+Extensions.swift in Sources */,
+				A10000000000000000000021 /* Color+Extensions.swift in Sources */,
+				A10000000000000000000022 /* View+Extensions.swift in Sources */,
+				A10000000000000000000023 /* Constants.swift in Sources */,
+				A10000000000000000000024 /* Haptics.swift in Sources */,
+				A10000000000000000000025 /* PrimaryButton.swift in Sources */,
+				A10000000000000000000026 /* SelectionCard.swift in Sources */,
+				A10000000000000000000027 /* ProgressBar.swift in Sources */,
+				A10000000000000000000028 /* OnboardingContainerView.swift in Sources */,
+				A10000000000000000000029 /* IdentitySelectionView.swift in Sources */,
+				A10000000000000000000030 /* TimeHorizonView.swift in Sources */,
+				A10000000000000000000031 /* AvailabilityView.swift in Sources */,
+				A10000000000000000000032 /* IntensityView.swift in Sources */,
+				A10000000000000000000033 /* PlanConfidenceView.swift in Sources */,
+				A10000000000000000000034 /* PlanGenerationView.swift in Sources */,
+				A10000000000000000000035 /* CalendarView.swift in Sources */,
+				A10000000000000000000036 /* WeekView.swift in Sources */,
+				A10000000000000000000037 /* DayView.swift in Sources */,
+				A10000000000000000000038 /* BlockView.swift in Sources */,
+				A10000000000000000000039 /* BlockDetailSheet.swift in Sources */,
+				A10000000000000000000040 /* WeeklyReflectionView.swift in Sources */,
+				A10000000000000000000041 /* ProgressTrackingView.swift in Sources */,
+				A10000000000000000000042 /* SettingsView.swift in Sources */,
+				A10000000000000000000043 /* PaywallView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A80000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A80000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A80000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IdentityCalendar/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Identity Calendar";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.identitycalendar.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A80000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IdentityCalendar/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Identity Calendar";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.identitycalendar.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A60000000000000000000000 /* Build configuration list for PBXProject "IdentityCalendar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A80000000000000000000001 /* Debug */,
+				A80000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A60000000000000000000001 /* Build configuration list for PBXNativeTarget "IdentityCalendar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A80000000000000000000003 /* Debug */,
+				A80000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A70000000000000000000001 /* Project object */;
+}
