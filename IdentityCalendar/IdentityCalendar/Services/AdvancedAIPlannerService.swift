@@ -1266,29 +1266,119 @@ final class ScheduleOptimizer {
         var allBlocks: [PlanBlock.PlanBlockData] = []
 
         let totalWeeks = goal.timeHorizon.weeks
-        let weeksToGenerate = min(3, totalWeeks) // Generate first 3 weeks
-        let startDate = goal.createdAt
+        let daysToGenerate = min(21, totalWeeks * 7) // Generate first 3 weeks worth of days
 
-        for weekOffset in 0..<weeksToGenerate {
-            let weekStart = calendar.date(byAdding: .weekOfYear, value: weekOffset, to: startDate) ?? startDate
-            let weekNumber = weekOffset + 1
+        // CRITICAL: Start from TODAY, not from goal.createdAt or week start
+        let today = calendar.startOfDay(for: Date())
+
+        // Get activities for the current phase
+        let activitiesPool = selectActivitiesForWeek(
+            domainPlan: domainPlan,
+            weekNumber: 1,
+            totalActivitiesNeeded: domainPlan.baseBlocksPerWeek * 3
+        )
+
+        var activityIndex = 0
+        var currentWeek = 1
+        var blocksThisWeek = 0
+        let maxBlocksPerDay = 3
+
+        // Generate blocks for each day starting from today
+        for dayOffset in 0..<daysToGenerate {
+            guard let blockDate = calendar.date(byAdding: .day, value: dayOffset, to: today) else {
+                continue
+            }
+
+            // Check if it's a rest day (Sunday by default)
+            let weekday = calendar.component(.weekday, from: blockDate)
+            let dayOfWeek = DayOfWeek.from(weekday: weekday)
+            if domainPlan.restDays.contains(dayOfWeek) {
+                continue
+            }
+
+            // Calculate week number
+            let daysFromStart = dayOffset
+            let newWeek = (daysFromStart / 7) + 1
+            if newWeek != currentWeek {
+                currentWeek = newWeek
+                blocksThisWeek = 0
+            }
 
             // First week is lighter (onboarding)
-            let isFirstWeek = weekOffset == 0
-            let blockCount = isFirstWeek
-                ? Int(Double(domainPlan.baseBlocksPerWeek) * 0.6)
+            let isFirstWeek = currentWeek == 1
+            let maxBlocksThisWeek = isFirstWeek
+                ? Int(Double(domainPlan.baseBlocksPerWeek) * 0.7)
                 : domainPlan.baseBlocksPerWeek
 
-            let weekBlocks = generateWeekBlocks(
-                domainPlan: domainPlan,
-                weekStart: weekStart,
-                blockCount: blockCount,
-                weekNumber: weekNumber,
-                durationMultiplier: isFirstWeek ? 0.8 : 1.0,
-                energyPattern: domainPlan.energyDistribution
-            )
+            if blocksThisWeek >= maxBlocksThisWeek {
+                continue
+            }
 
-            allBlocks.append(contentsOf: weekBlocks)
+            // Determine how many blocks for this day
+            let blocksForToday = min(maxBlocksPerDay, maxBlocksThisWeek - blocksThisWeek, max(1, (maxBlocksThisWeek / 5)))
+
+            // Time slots for the day
+            let timeSlots = generateTimeSlots(for: domainPlan.energyDistribution)
+
+            for blockIndex in 0..<blocksForToday {
+                guard activityIndex < activitiesPool.count else {
+                    activityIndex = 0 // Cycle through activities
+                }
+
+                let activity = activitiesPool[activityIndex]
+                activityIndex += 1
+
+                // Get time slot
+                let slotIndex = blockIndex % timeSlots.count
+                let timeSlot = timeSlots[slotIndex]
+                let (hour, minute) = getOptimalTime(for: activity.blockType, slot: timeSlot, energyPattern: domainPlan.energyDistribution)
+
+                var components = calendar.dateComponents([.year, .month, .day], from: blockDate)
+                components.hour = hour
+                components.minute = minute
+
+                guard let startTime = calendar.date(from: components) else { continue }
+
+                // Calculate duration
+                let durationMultiplier = isFirstWeek ? 0.8 : 1.0
+                let duration = Int(Double(activity.duration) * durationMultiplier)
+                let boundedDuration = max(15, min(120, duration))
+
+                let endTime = startTime.addingTimeInterval(Double(boundedDuration * 60))
+
+                allBlocks.append(PlanBlock.PlanBlockData(
+                    startDateTime: isoFormatter.string(from: startTime),
+                    endDateTime: isoFormatter.string(from: endTime),
+                    title: activity.title,
+                    blockType: activity.blockType.rawValue,
+                    intentShort: activity.intent,
+                    weekNumber: currentWeek
+                ))
+
+                blocksThisWeek += 1
+            }
+        }
+
+        // Add weekly review blocks
+        for week in 1...min(3, totalWeeks) {
+            if let reviewDate = calendar.date(byAdding: .day, value: (week * 7) - 1, to: today) {
+                var components = calendar.dateComponents([.year, .month, .day], from: reviewDate)
+                components.hour = 19
+                components.minute = 0
+
+                if let reviewStart = calendar.date(from: components) {
+                    let reviewEnd = reviewStart.addingTimeInterval(30 * 60)
+
+                    allBlocks.append(PlanBlock.PlanBlockData(
+                        startDateTime: isoFormatter.string(from: reviewStart),
+                        endDateTime: isoFormatter.string(from: reviewEnd),
+                        title: "Weekly Review & Planning",
+                        blockType: BlockType.review.rawValue,
+                        intentShort: "Reflect on progress and plan ahead",
+                        weekNumber: week
+                    ))
+                }
+            }
         }
 
         return allBlocks
@@ -1780,6 +1870,20 @@ enum DayOfWeek {
         case .thursday: return 4
         case .friday: return 5
         case .saturday: return 6
+        }
+    }
+
+    /// Create from Calendar weekday (1 = Sunday, 7 = Saturday)
+    static func from(weekday: Int) -> DayOfWeek {
+        switch weekday {
+        case 1: return .sunday
+        case 2: return .monday
+        case 3: return .tuesday
+        case 4: return .wednesday
+        case 5: return .thursday
+        case 6: return .friday
+        case 7: return .saturday
+        default: return .sunday
         }
     }
 }

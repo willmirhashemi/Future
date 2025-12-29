@@ -218,6 +218,13 @@ final class CalendarViewModel: ObservableObject {
         loadBlocks()
     }
 
+    func addBlock(_ block: PlanBlock) {
+        Haptics.success()
+        guard let goal = activeGoal else { return }
+        dataService.addBlocks([block], to: goal)
+        loadBlocks()
+    }
+
     // MARK: - Reflection
 
     func checkForReflection() {

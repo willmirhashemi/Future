@@ -57,6 +57,18 @@ extension Date {
         return formatter.string(from: self)
     }
 
+    var weekdayString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE"
+        return formatter.string(from: self)
+    }
+
+    var fullDateString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM d, yyyy"
+        return formatter.string(from: self)
+    }
+
     // MARK: - Calendar Helpers
 
     var startOfDay: Date {

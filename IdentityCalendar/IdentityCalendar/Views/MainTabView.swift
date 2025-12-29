@@ -62,7 +62,7 @@ struct CustomTabBar: View {
     let colorScheme: ColorScheme
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 40) { // Closer spacing between tabs
             ForEach(AppTab.allCases, id: \.self) { tab in
                 TabBarButton(
                     tab: tab,
@@ -77,9 +77,9 @@ struct CustomTabBar: View {
                 )
             }
         }
-        .padding(.horizontal, 24)
-        .padding(.top, 12)
-        .padding(.bottom, 28)
+        .frame(maxWidth: .infinity) // Center the tabs
+        .padding(.top, 14)
+        .padding(.bottom, 30)
         .background(
             TabBarBackground(colorScheme: colorScheme)
         )
@@ -94,19 +94,28 @@ struct TabBarButton: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 4) {
-                Image(systemName: isSelected ? tab.selectedIcon : tab.icon)
-                    .font(.system(size: 22, weight: isSelected ? .semibold : .regular))
-                    .foregroundColor(isSelected ? AppTheme.accent : AppTheme.tertiaryText(colorScheme))
-                    .scaleEffect(isSelected ? 1.1 : 1.0)
+            VStack(spacing: 5) {
+                ZStack {
+                    // Selected indicator background
+                    if isSelected {
+                        Circle()
+                            .fill(AppTheme.accent.opacity(0.15))
+                            .frame(width: 48, height: 48)
+                    }
+
+                    Image(systemName: isSelected ? tab.selectedIcon : tab.icon)
+                        .font(.system(size: 22, weight: isSelected ? .semibold : .regular))
+                        .foregroundColor(isSelected ? AppTheme.accent : AppTheme.tertiaryText(colorScheme))
+                }
+                .frame(width: 48, height: 48)
 
                 Text(tab.title)
                     .font(.caption2.weight(isSelected ? .semibold : .regular))
                     .foregroundColor(isSelected ? AppTheme.accent : AppTheme.tertiaryText(colorScheme))
             }
-            .frame(maxWidth: .infinity)
+            .frame(width: 80) // Fixed width for consistent spacing
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ScaleButtonStyle())
     }
 }
 
