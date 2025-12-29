@@ -50,6 +50,12 @@
 		A10000000000000000000041 /* ProgressTrackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000041 /* ProgressTrackingView.swift */; };
 		A10000000000000000000042 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000042 /* SettingsView.swift */; };
 		A10000000000000000000043 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000043 /* PaywallView.swift */; };
+		A10000000000000000000044 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000045 /* ThemeManager.swift */; };
+		A10000000000000000000045 /* NewOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000046 /* NewOnboardingView.swift */; };
+		A10000000000000000000046 /* NewOnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000047 /* NewOnboardingViewModel.swift */; };
+		A10000000000000000000047 /* NewCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000048 /* NewCalendarView.swift */; };
+		A10000000000000000000048 /* FutureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000049 /* FutureView.swift */; };
+		A10000000000000000000049 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000050 /* MainTabView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -98,6 +104,12 @@
 		A20000000000000000000042 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A20000000000000000000043 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		A20000000000000000000044 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A20000000000000000000045 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
+		A20000000000000000000046 /* NewOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewOnboardingView.swift; sourceTree = "<group>"; };
+		A20000000000000000000047 /* NewOnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewOnboardingViewModel.swift; sourceTree = "<group>"; };
+		A20000000000000000000048 /* NewCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCalendarView.swift; sourceTree = "<group>"; };
+		A20000000000000000000049 /* FutureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureView.swift; sourceTree = "<group>"; };
+		A20000000000000000000050 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,6 +197,7 @@
 				A20000000000000000000017 /* ProgressViewModel.swift */,
 				A20000000000000000000018 /* SettingsViewModel.swift */,
 				A20000000000000000000019 /* PaywallViewModel.swift */,
+				A20000000000000000000047 /* NewOnboardingViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -199,8 +212,18 @@
 				A40000000000000000000014 /* Progress */,
 				A40000000000000000000015 /* Settings */,
 				A40000000000000000000016 /* Paywall */,
+				A40000000000000000000017 /* Future */,
+				A20000000000000000000050 /* MainTabView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		A40000000000000000000017 /* Future */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000049 /* FutureView.swift */,
+			);
+			path = Future;
 			sourceTree = "<group>";
 		};
 		A40000000000000000000008 /* Extensions */ = {
@@ -218,6 +241,7 @@
 			children = (
 				A20000000000000000000023 /* Constants.swift */,
 				A20000000000000000000024 /* Haptics.swift */,
+				A20000000000000000000045 /* ThemeManager.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -242,6 +266,7 @@
 				A20000000000000000000032 /* IntensityView.swift */,
 				A20000000000000000000033 /* PlanConfidenceView.swift */,
 				A20000000000000000000034 /* PlanGenerationView.swift */,
+				A20000000000000000000046 /* NewOnboardingView.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -254,6 +279,7 @@
 				A20000000000000000000037 /* DayView.swift */,
 				A20000000000000000000038 /* BlockView.swift */,
 				A20000000000000000000039 /* BlockDetailSheet.swift */,
+				A20000000000000000000048 /* NewCalendarView.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -401,6 +427,12 @@
 				A10000000000000000000041 /* ProgressTrackingView.swift in Sources */,
 				A10000000000000000000042 /* SettingsView.swift in Sources */,
 				A10000000000000000000043 /* PaywallView.swift in Sources */,
+				A10000000000000000000044 /* ThemeManager.swift in Sources */,
+				A10000000000000000000045 /* NewOnboardingView.swift in Sources */,
+				A10000000000000000000046 /* NewOnboardingViewModel.swift in Sources */,
+				A10000000000000000000047 /* NewCalendarView.swift in Sources */,
+				A10000000000000000000048 /* FutureView.swift in Sources */,
+				A10000000000000000000049 /* MainTabView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

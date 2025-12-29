@@ -1,94 +1,7 @@
 import SwiftUI
 
 extension Color {
-    // MARK: - App Color Palette (Apple-like, calm, neutral)
-
-    /// Primary background - pure white
-    static let appBackground = Color(uiColor: .systemBackground)
-
-    /// Secondary background - very subtle gray
-    static let appSecondaryBackground = Color(uiColor: .secondarySystemBackground)
-
-    /// Tertiary background - slightly darker
-    static let appTertiaryBackground = Color(uiColor: .tertiarySystemBackground)
-
-    /// Primary text - near black
-    static let appPrimaryText = Color(uiColor: .label)
-
-    /// Secondary text - muted gray
-    static let appSecondaryText = Color(uiColor: .secondaryLabel)
-
-    /// Tertiary text - lighter gray
-    static let appTertiaryText = Color(uiColor: .tertiaryLabel)
-
-    /// Primary accent - calm blue
-    static let appAccent = Color(red: 0.25, green: 0.45, blue: 0.65)
-
-    /// Success color - soft green
-    static let appSuccess = Color(red: 0.35, green: 0.55, blue: 0.35)
-
-    /// Warning color - muted amber
-    static let appWarning = Color(red: 0.65, green: 0.55, blue: 0.35)
-
-    /// Separator color
-    static let appSeparator = Color(uiColor: .separator)
-
-    /// Card background
-    static let appCardBackground = Color.white
-
-    // MARK: - Block Type Colors (Subtle, calm)
-
-    static let blockFocus = Color(red: 0.20, green: 0.40, blue: 0.60)
-    static let blockLight = Color(red: 0.45, green: 0.55, blue: 0.45)
-    static let blockHabit = Color(red: 0.55, green: 0.45, blue: 0.40)
-    static let blockReview = Color(red: 0.40, green: 0.40, blue: 0.50)
-
-    // MARK: - Semantic Colors
-
-    static let calendarToday = Color.appAccent.opacity(0.08)
-    static let calendarSelected = Color.appAccent.opacity(0.15)
-    static let blockBackground = Color.appSecondaryBackground
-
-    // MARK: - Gradient Helpers
-
-    static var subtleGradient: LinearGradient {
-        LinearGradient(
-            colors: [
-                Color.white,
-                Color(red: 0.98, green: 0.98, blue: 0.99)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
-    static var premiumGradient: LinearGradient {
-        LinearGradient(
-            colors: [
-                Color(red: 0.15, green: 0.25, blue: 0.35),
-                Color(red: 0.25, green: 0.35, blue: 0.45)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    // MARK: - Dynamic Colors
-
-    static func blockColor(for type: BlockType) -> Color {
-        switch type {
-        case .focus: return .blockFocus
-        case .light: return .blockLight
-        case .habit: return .blockHabit
-        case .review: return .blockReview
-        }
-    }
-
-    static func blockBackgroundColor(for type: BlockType) -> Color {
-        blockColor(for: type).opacity(0.12)
-    }
-
-    // MARK: - Initialization Helpers
+    // MARK: - Hex Initialization
 
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -115,12 +28,67 @@ extension Color {
             opacity: Double(a) / 255
         )
     }
+
+    // MARK: - Static Accent Colors
+
+    static let appAccent = AppTheme.accent
+    static let appSuccess = AppTheme.success
+    static let appWarning = AppTheme.warning
+    static let appError = AppTheme.error
+
+    // MARK: - Legacy Compatibility (use AppTheme instead)
+
+    static let appBackground = Color(uiColor: .systemBackground)
+    static let appSecondaryBackground = Color(uiColor: .secondarySystemBackground)
+    static let appTertiaryBackground = Color(uiColor: .tertiarySystemBackground)
+    static let appPrimaryText = Color(uiColor: .label)
+    static let appSecondaryText = Color(uiColor: .secondaryLabel)
+    static let appTertiaryText = Color(uiColor: .tertiaryLabel)
+    static let appSeparator = Color(uiColor: .separator)
+    static let appCardBackground = Color(uiColor: .systemBackground)
+
+    // MARK: - Block Type Colors
+
+    static func blockColor(for type: BlockType, colorScheme: ColorScheme) -> Color {
+        switch type {
+        case .focus: return AppTheme.blockFocus(colorScheme)
+        case .light: return AppTheme.blockLight(colorScheme)
+        case .habit: return AppTheme.blockHabit(colorScheme)
+        case .review: return AppTheme.blockReview(colorScheme)
+        }
+    }
+
+    static func blockBackgroundColor(for type: BlockType, colorScheme: ColorScheme) -> Color {
+        blockColor(for: type, colorScheme: colorScheme).opacity(colorScheme == .dark ? 0.25 : 0.15)
+    }
+
+    // Legacy support
+    static func blockColor(for type: BlockType) -> Color {
+        switch type {
+        case .focus: return Color(hex: "3B82F6")
+        case .light: return Color(hex: "10B981")
+        case .habit: return Color(hex: "F59E0B")
+        case .review: return Color(hex: "8B5CF6")
+        }
+    }
+
+    static func blockBackgroundColor(for type: BlockType) -> Color {
+        blockColor(for: type).opacity(0.2)
+    }
+
+    // MARK: - Calendar Colors
+
+    static func calendarToday(_ colorScheme: ColorScheme) -> Color {
+        AppTheme.accent.opacity(colorScheme == .dark ? 0.15 : 0.1)
+    }
+
+    static func calendarSelected(_ colorScheme: ColorScheme) -> Color {
+        AppTheme.accent.opacity(colorScheme == .dark ? 0.25 : 0.15)
+    }
 }
 
 // MARK: - ShapeStyle Extension
 
 extension ShapeStyle where Self == Color {
     static var appAccent: Color { .appAccent }
-    static var appBackground: Color { .appBackground }
-    static var appSecondaryBackground: Color { .appSecondaryBackground }
 }

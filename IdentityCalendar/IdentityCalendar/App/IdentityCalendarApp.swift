@@ -7,6 +7,7 @@ struct IdentityCalendarApp: App {
     @StateObject private var dataService = DataService.shared
     @StateObject private var subscriptionService = SubscriptionService.shared
     @StateObject private var notificationService = NotificationService.shared
+    @StateObject private var themeManager = ThemeManager.shared
 
     var body: some Scene {
         WindowGroup {
@@ -14,7 +15,9 @@ struct IdentityCalendarApp: App {
                 .environmentObject(dataService)
                 .environmentObject(subscriptionService)
                 .environmentObject(notificationService)
+                .environmentObject(themeManager)
                 .modelContainer(dataService.modelContainer)
+                .themed()
         }
     }
 }
@@ -22,15 +25,19 @@ struct IdentityCalendarApp: App {
 /// Root view that handles navigation between onboarding and main app
 struct RootView: View {
     @EnvironmentObject private var dataService: DataService
+    @Environment(\.appColorScheme) private var colorScheme
     @State private var showOnboarding = false
     @State private var isLoading = true
 
     var body: some View {
         ZStack {
+            AppTheme.background(colorScheme)
+                .ignoresSafeArea()
+
             if isLoading {
-                LaunchView()
+                LaunchView(colorScheme: colorScheme)
             } else if showOnboarding {
-                OnboardingContainerView {
+                NewOnboardingView {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         showOnboarding = false
                     }
@@ -50,7 +57,7 @@ struct RootView: View {
 
     private func checkOnboardingStatus() {
         // Brief delay for launch screen
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             let user = dataService.currentUser
             let needsOnboarding = user == nil || !user!.hasCompletedOnboarding
 
@@ -64,40 +71,52 @@ struct RootView: View {
 
 /// Launch screen view
 struct LaunchView: View {
+    let colorScheme: ColorScheme
     @State private var iconScale: CGFloat = 0.8
     @State private var iconOpacity: Double = 0
+    @State private var textOpacity: Double = 0
 
     var body: some View {
         ZStack {
-            Color.appBackground
+            AppTheme.background(colorScheme)
                 .ignoresSafeArea()
 
-            VStack(spacing: 16) {
-                Image(systemName: "calendar")
-                    .font(.system(size: 60))
-                    .foregroundColor(.appAccent)
-                    .scaleEffect(iconScale)
-                    .opacity(iconOpacity)
+            VStack(spacing: 20) {
+                // Animated logo
+                ZStack {
+                    Circle()
+                        .fill(AppTheme.accent.opacity(0.15))
+                        .frame(width: 100, height: 100)
+                        .scaleEffect(iconScale)
 
-                Text("Identity Calendar")
-                    .font(.title2.weight(.semibold))
-                    .foregroundColor(.appPrimaryText)
-                    .opacity(iconOpacity)
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 44))
+                        .foregroundColor(AppTheme.accent)
+                        .scaleEffect(iconScale)
+                }
+                .opacity(iconOpacity)
+
+                VStack(spacing: 8) {
+                    Text("Future")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(AppTheme.primaryText(colorScheme))
+
+                    Text("Plan your path")
+                        .font(.subheadline)
+                        .foregroundColor(AppTheme.secondaryText(colorScheme))
+                }
+                .opacity(textOpacity)
             }
         }
         .onAppear {
-            withAnimation(.easeOut(duration: 0.4)) {
+            withAnimation(.easeOut(duration: 0.5)) {
                 iconScale = 1.0
                 iconOpacity = 1.0
             }
+            withAnimation(.easeOut(duration: 0.5).delay(0.2)) {
+                textOpacity = 1.0
+            }
         }
-    }
-}
-
-/// Main tab view (currently just calendar, expandable)
-struct MainTabView: View {
-    var body: some View {
-        CalendarView()
     }
 }
 
@@ -148,4 +167,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         .environmentObject(DataService.shared)
         .environmentObject(SubscriptionService.shared)
         .environmentObject(NotificationService.shared)
+        .environmentObject(ThemeManager.shared)
+        .themed()
 }
