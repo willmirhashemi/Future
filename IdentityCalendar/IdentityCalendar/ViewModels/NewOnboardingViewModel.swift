@@ -54,7 +54,8 @@ final class NewOnboardingViewModel: ObservableObject {
         aiPlanner: AIPlannerService? = nil
     ) {
         self.dataService = dataService
-        self.aiPlanner = aiPlanner ?? MockAIPlannerService()
+        // Use the Advanced AI Planner for intelligent planning
+        self.aiPlanner = aiPlanner ?? AdvancedAIPlannerService()
     }
 
     // MARK: - Navigation

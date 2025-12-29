@@ -17,6 +17,7 @@
 		A10000000000000000000008 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* Subscription.swift */; };
 		A10000000000000000000009 /* AIPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* AIPlannerService.swift */; };
 		A10000000000000000000010 /* MockAIPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000010 /* MockAIPlannerService.swift */; };
+		A10000000000000000000050 /* AdvancedAIPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000051 /* AdvancedAIPlannerService.swift */; };
 		A10000000000000000000011 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* NotificationService.swift */; };
 		A10000000000000000000012 /* SubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000012 /* SubscriptionService.swift */; };
 		A10000000000000000000013 /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* DataService.swift */; };
@@ -70,6 +71,7 @@
 		A20000000000000000000008 /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
 		A20000000000000000000009 /* AIPlannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIPlannerService.swift; sourceTree = "<group>"; };
 		A20000000000000000000010 /* MockAIPlannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAIPlannerService.swift; sourceTree = "<group>"; };
+		A20000000000000000000051 /* AdvancedAIPlannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedAIPlannerService.swift; sourceTree = "<group>"; };
 		A20000000000000000000011 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		A20000000000000000000012 /* SubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionService.swift; sourceTree = "<group>"; };
 		A20000000000000000000013 /* DataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataService.swift; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 			children = (
 				A20000000000000000000009 /* AIPlannerService.swift */,
 				A20000000000000000000010 /* MockAIPlannerService.swift */,
+				A20000000000000000000051 /* AdvancedAIPlannerService.swift */,
 				A20000000000000000000011 /* NotificationService.swift */,
 				A20000000000000000000012 /* SubscriptionService.swift */,
 				A20000000000000000000013 /* DataService.swift */,
@@ -394,6 +397,7 @@
 				A10000000000000000000008 /* Subscription.swift in Sources */,
 				A10000000000000000000009 /* AIPlannerService.swift in Sources */,
 				A10000000000000000000010 /* MockAIPlannerService.swift in Sources */,
+				A10000000000000000000050 /* AdvancedAIPlannerService.swift in Sources */,
 				A10000000000000000000011 /* NotificationService.swift in Sources */,
 				A10000000000000000000012 /* SubscriptionService.swift in Sources */,
 				A10000000000000000000013 /* DataService.swift in Sources */,

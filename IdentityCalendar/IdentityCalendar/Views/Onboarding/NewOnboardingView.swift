@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// New AI-powered onboarding with free-form goal input
+/// New AI-powered onboarding with free-form goal input and polished animations
 struct NewOnboardingView: View {
     @StateObject private var viewModel = NewOnboardingViewModel()
     @Environment(\.colorScheme) private var colorScheme
@@ -17,6 +17,10 @@ struct NewOnboardingView: View {
                 switch viewModel.currentStep {
                 case .welcome:
                     WelcomeStepView(onContinue: viewModel.goToGoalInput)
+                        .transition(.asymmetric(
+                            insertion: .opacity.combined(with: .scale(scale: 0.95)),
+                            removal: .opacity.combined(with: .move(edge: .leading))
+                        ))
 
                 case .goalInput:
                     GoalInputStepView(
@@ -25,9 +29,14 @@ struct NewOnboardingView: View {
                         onSubmit: viewModel.processGoal,
                         onBack: viewModel.goToWelcome
                     )
+                    .transition(.asymmetric(
+                        insertion: .opacity.combined(with: .move(edge: .trailing)),
+                        removal: .opacity.combined(with: .scale(scale: 0.95))
+                    ))
 
                 case .processing:
                     ProcessingStepView()
+                        .transition(.opacity.combined(with: .scale(scale: 1.05)))
 
                 case .planPreview:
                     PlanPreviewStepView(
@@ -38,6 +47,10 @@ struct NewOnboardingView: View {
                         },
                         onRegenerate: viewModel.regeneratePlan
                     )
+                    .transition(.asymmetric(
+                        insertion: .opacity.combined(with: .move(edge: .bottom)),
+                        removal: .opacity
+                    ))
 
                 case .error:
                     ErrorStepView(
@@ -45,10 +58,11 @@ struct NewOnboardingView: View {
                         onRetry: viewModel.retryProcessing,
                         onBack: viewModel.goToGoalInput
                     )
+                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
                 }
             }
         }
-        .animation(.easeInOut(duration: 0.3), value: viewModel.currentStep)
+        .animation(.spring(response: 0.5, dampingFraction: 0.85), value: viewModel.currentStep)
     }
 }
 
@@ -58,58 +72,138 @@ struct WelcomeStepView: View {
     @Environment(\.appColorScheme) private var colorScheme
     let onContinue: () -> Void
 
+    // Staggered animation states
+    @State private var logoScale: CGFloat = 0.5
+    @State private var logoOpacity: Double = 0
+    @State private var titleOpacity: Double = 0
+    @State private var titleOffset: CGFloat = 20
+    @State private var subtitleOpacity: Double = 0
+    @State private var featuresOpacity: Double = 0
+    @State private var featuresOffset: CGFloat = 30
+    @State private var buttonOpacity: Double = 0
+    @State private var buttonOffset: CGFloat = 20
+    @State private var pulseScale: CGFloat = 1.0
+
     var body: some View {
         VStack(spacing: 40) {
             Spacer()
 
-            // Logo/Icon
+            // Logo/Icon with glow effect
             ZStack {
+                // Outer pulse glow
+                Circle()
+                    .fill(AppTheme.accent.opacity(0.08))
+                    .frame(width: 150, height: 150)
+                    .scaleEffect(pulseScale)
+
                 Circle()
                     .fill(AppTheme.accent.opacity(0.15))
                     .frame(width: 120, height: 120)
+                    .scaleEffect(logoScale)
 
                 Image(systemName: "sparkles")
-                    .font(.system(size: 50))
-                    .foregroundColor(AppTheme.accent)
+                    .font(.system(size: 50, weight: .medium))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [AppTheme.accent, AppTheme.accentLight],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .scaleEffect(logoScale)
             }
+            .opacity(logoOpacity)
 
             VStack(spacing: 16) {
                 Text("Your Future Starts Here")
-                    .font(.system(size: 32, weight: .bold))
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundColor(AppTheme.primaryText(colorScheme))
                     .multilineTextAlignment(.center)
+                    .opacity(titleOpacity)
+                    .offset(y: titleOffset)
 
                 Text("Tell us your goals and we'll create a personalized plan to help you achieve them.")
                     .font(.body)
                     .foregroundColor(AppTheme.secondaryText(colorScheme))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
+                    .opacity(subtitleOpacity)
             }
 
             Spacer()
 
-            // Features preview
+            // Features preview with staggered animation
             VStack(spacing: 16) {
-                FeatureRow(icon: "brain.head.profile", text: "AI-powered planning", colorScheme: colorScheme)
-                FeatureRow(icon: "calendar", text: "Smart calendar integration", colorScheme: colorScheme)
-                FeatureRow(icon: "arrow.triangle.2.circlepath", text: "Adaptive scheduling", colorScheme: colorScheme)
+                AnimatedFeatureRow(icon: "brain.head.profile", text: "AI-powered planning", colorScheme: colorScheme, delay: 0)
+                AnimatedFeatureRow(icon: "calendar", text: "Smart calendar integration", colorScheme: colorScheme, delay: 0.1)
+                AnimatedFeatureRow(icon: "arrow.triangle.2.circlepath", text: "Adaptive scheduling", colorScheme: colorScheme, delay: 0.2)
             }
             .padding(.horizontal, 32)
+            .opacity(featuresOpacity)
+            .offset(y: featuresOffset)
 
             Spacer()
 
-            // CTA
+            // CTA with bounce effect
             Button(action: onContinue) {
                 Text("Get Started")
                     .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(AppTheme.accent)
+                    .background(
+                        LinearGradient(
+                            colors: [AppTheme.accent, AppTheme.accent.opacity(0.85)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .shadow(color: AppTheme.accent.opacity(0.3), radius: 12, x: 0, y: 6)
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 32)
+            .opacity(buttonOpacity)
+            .offset(y: buttonOffset)
+        }
+        .onAppear {
+            startEntranceAnimations()
+        }
+    }
+
+    private func startEntranceAnimations() {
+        // Logo entrance
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+            logoScale = 1.0
+            logoOpacity = 1.0
+        }
+
+        // Title entrance
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.15)) {
+            titleOpacity = 1.0
+            titleOffset = 0
+        }
+
+        // Subtitle entrance
+        withAnimation(.easeOut(duration: 0.5).delay(0.3)) {
+            subtitleOpacity = 1.0
+        }
+
+        // Features entrance
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.4)) {
+            featuresOpacity = 1.0
+            featuresOffset = 0
+        }
+
+        // Button entrance
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.55)) {
+            buttonOpacity = 1.0
+            buttonOffset = 0
+        }
+
+        // Continuous pulse animation
+        withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true).delay(0.7)) {
+            pulseScale = 1.12
         }
     }
 }
@@ -131,6 +225,49 @@ struct FeatureRow: View {
                 .foregroundColor(AppTheme.secondaryText(colorScheme))
 
             Spacer()
+        }
+    }
+}
+
+struct AnimatedFeatureRow: View {
+    let icon: String
+    let text: String
+    let colorScheme: ColorScheme
+    let delay: Double
+
+    @State private var isVisible = false
+    @State private var offset: CGFloat = 15
+
+    var body: some View {
+        HStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(AppTheme.accent.opacity(0.1))
+                    .frame(width: 40, height: 40)
+
+                Image(systemName: icon)
+                    .font(.system(size: 18))
+                    .foregroundColor(AppTheme.accent)
+            }
+
+            Text(text)
+                .font(.subheadline.weight(.medium))
+                .foregroundColor(AppTheme.secondaryText(colorScheme))
+
+            Spacer()
+
+            Image(systemName: "checkmark")
+                .font(.caption.weight(.bold))
+                .foregroundColor(AppTheme.success)
+                .opacity(isVisible ? 1 : 0)
+        }
+        .opacity(isVisible ? 1 : 0)
+        .offset(x: offset)
+        .onAppear {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.5 + delay)) {
+                isVisible = true
+                offset = 0
+            }
         }
     }
 }

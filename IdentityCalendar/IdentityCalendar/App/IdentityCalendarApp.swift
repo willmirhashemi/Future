@@ -69,52 +69,98 @@ struct RootView: View {
     }
 }
 
-/// Launch screen view
+/// Launch screen view with polished animations
 struct LaunchView: View {
     let colorScheme: ColorScheme
-    @State private var iconScale: CGFloat = 0.8
+    @State private var iconScale: CGFloat = 0.6
     @State private var iconOpacity: Double = 0
     @State private var textOpacity: Double = 0
+    @State private var subtitleOpacity: Double = 0
+    @State private var glowOpacity: Double = 0
+    @State private var pulseScale: CGFloat = 1.0
 
     var body: some View {
         ZStack {
             AppTheme.background(colorScheme)
                 .ignoresSafeArea()
 
-            VStack(spacing: 20) {
-                // Animated logo
+            VStack(spacing: 24) {
+                // Animated logo with glow effect
                 ZStack {
+                    // Outer glow pulse
+                    Circle()
+                        .fill(AppTheme.accent.opacity(0.08))
+                        .frame(width: 140, height: 140)
+                        .scaleEffect(pulseScale)
+                        .opacity(glowOpacity)
+
+                    // Inner glow
                     Circle()
                         .fill(AppTheme.accent.opacity(0.15))
-                        .frame(width: 100, height: 100)
+                        .frame(width: 110, height: 110)
                         .scaleEffect(iconScale)
 
+                    // Icon background
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [AppTheme.accent.opacity(0.2), AppTheme.accent.opacity(0.1)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 90, height: 90)
+                        .scaleEffect(iconScale)
+
+                    // Sparkles icon
                     Image(systemName: "sparkles")
-                        .font(.system(size: 44))
-                        .foregroundColor(AppTheme.accent)
+                        .font(.system(size: 40, weight: .medium))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [AppTheme.accent, AppTheme.accentLight],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
                         .scaleEffect(iconScale)
                 }
                 .opacity(iconOpacity)
 
-                VStack(spacing: 8) {
-                    Text("Future")
-                        .font(.system(size: 32, weight: .bold))
+                VStack(spacing: 10) {
+                    Text("Endless Future")
+                        .font(.system(size: 34, weight: .bold, design: .rounded))
                         .foregroundColor(AppTheme.primaryText(colorScheme))
+                        .opacity(textOpacity)
 
-                    Text("Plan your path")
-                        .font(.subheadline)
+                    Text("Your path, infinitely planned")
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundColor(AppTheme.secondaryText(colorScheme))
+                        .opacity(subtitleOpacity)
                 }
-                .opacity(textOpacity)
             }
         }
         .onAppear {
-            withAnimation(.easeOut(duration: 0.5)) {
+            // Staggered entrance animations
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
                 iconScale = 1.0
                 iconOpacity = 1.0
             }
-            withAnimation(.easeOut(duration: 0.5).delay(0.2)) {
+
+            withAnimation(.easeOut(duration: 0.6).delay(0.15)) {
+                glowOpacity = 1.0
+            }
+
+            withAnimation(.easeOut(duration: 0.5).delay(0.25)) {
                 textOpacity = 1.0
+            }
+
+            withAnimation(.easeOut(duration: 0.5).delay(0.4)) {
+                subtitleOpacity = 1.0
+            }
+
+            // Subtle pulse animation
+            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true).delay(0.6)) {
+                pulseScale = 1.15
             }
         }
     }
