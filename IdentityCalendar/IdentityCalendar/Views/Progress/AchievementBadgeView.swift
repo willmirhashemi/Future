@@ -298,7 +298,6 @@ struct AchievementDetailSheet: View {
     }
 }
 
-extension Achievement: Identifiable {}
 
 // MARK: - Preview
 
