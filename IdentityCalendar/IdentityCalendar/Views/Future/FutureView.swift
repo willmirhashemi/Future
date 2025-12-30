@@ -1,12 +1,21 @@
 import SwiftUI
 
-/// Future section - Progress tracking and pro features
+/// Future section - Progress tracking, achievements, and analytics
 struct FutureView: View {
     @StateObject private var progressViewModel = ProgressViewModel()
+    @ObservedObject private var dataService = DataService.shared
     @Environment(\.appColorScheme) private var colorScheme
     @ObservedObject private var subscriptionService = SubscriptionService.shared
     @State private var showPaywall = false
     @State private var showSettings = false
+    @State private var showAllAchievements = false
+    @State private var selectedSection: FutureSection = .overview
+
+    enum FutureSection: String, CaseIterable {
+        case overview = "Overview"
+        case achievements = "Achievements"
+        case analytics = "Analytics"
+    }
 
     var body: some View {
         ZStack {
@@ -14,53 +23,25 @@ struct FutureView: View {
                 .ignoresSafeArea()
 
             ScrollView {
-                VStack(spacing: 20) {
-                    // Header
-                    FutureHeaderView(
+                VStack(spacing: 24) {
+                    // Header with settings
+                    EnhancedFutureHeaderView(
                         goalName: progressViewModel.identityName,
-                        progress: progressViewModel.progressPercentage,
                         colorScheme: colorScheme,
                         onSettingsTap: { showSettings = true }
                     )
 
-                    // Quick stats
-                    QuickStatsView(
-                        streak: progressViewModel.currentStreak,
-                        completed: progressViewModel.completedBlocks,
-                        total: progressViewModel.totalBlocks,
-                        colorScheme: colorScheme
-                    )
+                    // Section Picker
+                    sectionPicker
 
-                    // Milestones
-                    if !progressViewModel.milestones.isEmpty {
-                        MilestonesCardView(
-                            milestones: progressViewModel.milestones,
-                            colorScheme: colorScheme
-                        )
-                    }
-
-                    // Pro features section
-                    if !subscriptionService.isPremium {
-                        ProFeaturesCard(
-                            colorScheme: colorScheme,
-                            onUpgrade: { showPaywall = true }
-                        )
-                    } else {
-                        // Insights (Pro feature)
-                        InsightsCardView(
-                            weeklyStats: progressViewModel.weeklyStats,
-                            colorScheme: colorScheme
-                        )
-                    }
-
-                    // Weekly reflection prompt
-                    if shouldShowReflection {
-                        ReflectionPromptCard(
-                            colorScheme: colorScheme,
-                            onStartReflection: {
-                                // Navigate to reflection
-                            }
-                        )
+                    // Content based on selected section
+                    switch selectedSection {
+                    case .overview:
+                        overviewSection
+                    case .achievements:
+                        achievementsSection
+                    case .analytics:
+                        analyticsSection
                     }
                 }
                 .padding(.horizontal, 16)
@@ -76,17 +57,576 @@ struct FutureView: View {
         .sheet(isPresented: $showSettings) {
             SettingsView()
         }
+        .sheet(isPresented: $showAllAchievements) {
+            AllAchievementsView(achievements: dataService.currentUser?.achievements ?? [])
+        }
         .onAppear {
             progressViewModel.loadData()
+            dataService.recordDailyEngagement()
+            initializeAchievementsIfNeeded()
+        }
+    }
+
+    // MARK: - Section Picker
+
+    private var sectionPicker: some View {
+        HStack(spacing: 8) {
+            ForEach(FutureSection.allCases, id: \.self) { section in
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        selectedSection = section
+                    }
+                    Haptics.tap()
+                } label: {
+                    Text(section.rawValue)
+                        .font(.system(size: 14, weight: selectedSection == section ? .semibold : .medium))
+                        .foregroundColor(
+                            selectedSection == section
+                                ? AppTheme.primaryText(colorScheme)
+                                : AppTheme.secondaryText(colorScheme)
+                        )
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(
+                            selectedSection == section
+                                ? AppTheme.accent.opacity(0.15)
+                                : Color.clear
+                        )
+                        .clipShape(Capsule())
+                }
+            }
+        }
+        .padding(4)
+        .background(AppTheme.cardBackground(colorScheme))
+        .clipShape(Capsule())
+    }
+
+    // MARK: - Overview Section
+
+    private var overviewSection: some View {
+        VStack(spacing: 20) {
+            // Hero Progress Ring
+            if let goal = dataService.activeGoal {
+                let streakInfo = dataService.getStreakInfo(for: goal)
+                HeroProgressRing(streakInfo: streakInfo)
+                    .padding(.vertical, 8)
+            }
+
+            // Progress Rings Row
+            if let goal = dataService.activeGoal {
+                let rings = dataService.getProgressRings(for: goal)
+                ProgressRingsRow(rings: rings)
+            }
+
+            // Quick stats (legacy, enhanced)
+            QuickStatsView(
+                streak: progressViewModel.currentStreak,
+                completed: progressViewModel.completedBlocks,
+                total: progressViewModel.totalBlocks,
+                colorScheme: colorScheme
+            )
+
+            // Recent Achievements
+            if let achievements = dataService.currentUser?.achievements {
+                RecentAchievementsCard(achievements: achievements)
+                    .onTapGesture {
+                        showAllAchievements = true
+                    }
+            }
+
+            // Milestones
+            if !progressViewModel.milestones.isEmpty {
+                MilestonesCardView(
+                    milestones: progressViewModel.milestones,
+                    colorScheme: colorScheme
+                )
+            }
+
+            // Pro features or Insights
+            if !subscriptionService.isPremium {
+                ProFeaturesCard(
+                    colorScheme: colorScheme,
+                    onUpgrade: { showPaywall = true }
+                )
+            } else {
+                InsightsCardView(
+                    weeklyStats: progressViewModel.weeklyStats,
+                    colorScheme: colorScheme
+                )
+            }
+
+            // Weekly reflection prompt
+            if shouldShowReflection {
+                ReflectionPromptCard(
+                    colorScheme: colorScheme,
+                    onStartReflection: {
+                        // Navigate to reflection
+                    }
+                )
+            }
+        }
+    }
+
+    // MARK: - Achievements Section
+
+    private var achievementsSection: some View {
+        VStack(spacing: 20) {
+            if let user = dataService.currentUser {
+                // Summary
+                AchievementsSummaryCard(
+                    unlocked: user.unlockedAchievements.count,
+                    total: user.achievements.count,
+                    colorScheme: colorScheme
+                )
+
+                // By Category
+                ForEach(AchievementCategory.allCases, id: \.self) { category in
+                    let categoryAchievements = user.achievements.filter {
+                        $0.achievementType.category == category
+                    }
+
+                    if !categoryAchievements.isEmpty {
+                        AchievementCategorySection(
+                            category: category,
+                            achievements: categoryAchievements,
+                            colorScheme: colorScheme
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Analytics Section
+
+    private var analyticsSection: some View {
+        VStack(spacing: 20) {
+            if let goal = dataService.activeGoal {
+                // Weekly Stats Card
+                let weekStats = dataService.getWeeklyStats(for: goal)
+                WeeklyAnalyticsCard(stats: weekStats, colorScheme: colorScheme)
+
+                // Best Day & Time
+                BestPerformanceCard(stats: weekStats, colorScheme: colorScheme)
+
+                // Weekly Comparison
+                WeeklyComparisonChart(
+                    goal: goal,
+                    dataService: dataService,
+                    colorScheme: colorScheme
+                )
+
+                // Insights (Pro)
+                if subscriptionService.isPremium {
+                    InsightsCardView(
+                        weeklyStats: progressViewModel.weeklyStats,
+                        colorScheme: colorScheme
+                    )
+                } else {
+                    LockedAnalyticsCard(
+                        colorScheme: colorScheme,
+                        onUpgrade: { showPaywall = true }
+                    )
+                }
+            }
         }
     }
 
     private var shouldShowReflection: Bool {
         Date().isSunday && subscriptionService.isPremium
     }
+
+    private func initializeAchievementsIfNeeded() {
+        if let user = dataService.currentUser {
+            dataService.initializeAchievements(for: user)
+        }
+    }
 }
 
-// MARK: - Future Header
+// MARK: - Enhanced Future Header
+
+struct EnhancedFutureHeaderView: View {
+    let goalName: String
+    let colorScheme: ColorScheme
+    let onSettingsTap: () -> Void
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Your Future")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundColor(AppTheme.primaryText(colorScheme))
+
+                Text(goalName)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(AppTheme.secondaryText(colorScheme))
+            }
+
+            Spacer()
+
+            Button(action: onSettingsTap) {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 18))
+                    .foregroundColor(AppTheme.secondaryText(colorScheme))
+                    .frame(width: 44, height: 44)
+                    .background(AppTheme.cardBackground(colorScheme))
+                    .clipShape(Circle())
+            }
+        }
+        .padding(.horizontal, 4)
+    }
+}
+
+// MARK: - Achievements Summary Card
+
+struct AchievementsSummaryCard: View {
+    let unlocked: Int
+    let total: Int
+    let colorScheme: ColorScheme
+
+    var progress: Double {
+        total > 0 ? Double(unlocked) / Double(total) : 0
+    }
+
+    var body: some View {
+        HStack(spacing: 20) {
+            ProgressRingView(
+                progress: progress,
+                label: "\(unlocked)",
+                sublabel: "of \(total)",
+                color: AppTheme.accent,
+                size: 80,
+                lineWidth: 8
+            )
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Achievements Unlocked")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(AppTheme.primaryText(colorScheme))
+
+                Text("\(Int(progress * 100))% Complete")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(AppTheme.secondaryText(colorScheme))
+
+                if unlocked < total {
+                    Text("\(total - unlocked) more to unlock")
+                        .font(.system(size: 13, weight: .regular))
+                        .foregroundColor(AppTheme.tertiaryText(colorScheme))
+                }
+            }
+
+            Spacer()
+        }
+        .padding(20)
+        .background(AppTheme.cardBackground(colorScheme))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+}
+
+// MARK: - Achievement Category Section
+
+struct AchievementCategorySection: View {
+    let category: AchievementCategory
+    let achievements: [Achievement]
+    let colorScheme: ColorScheme
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: category.icon)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(AppTheme.accent)
+                Text(category.rawValue.uppercased())
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(AppTheme.secondaryText(colorScheme))
+                    .tracking(1)
+            }
+
+            AchievementsGridView(
+                achievements: achievements.sorted { $0.isUnlocked && !$1.isUnlocked },
+                columns: 4
+            )
+        }
+        .padding(16)
+        .background(AppTheme.cardBackground(colorScheme))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+}
+
+// MARK: - Weekly Analytics Card
+
+struct WeeklyAnalyticsCard: View {
+    let stats: WeeklyStats
+    let colorScheme: ColorScheme
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 8) {
+                Image(systemName: "chart.bar.fill")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(AppTheme.accent)
+                Text("THIS WEEK")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(AppTheme.secondaryText(colorScheme))
+                    .tracking(1)
+            }
+
+            HStack(spacing: 16) {
+                AnalyticStatBox(
+                    value: "\(stats.completedBlocks)",
+                    label: "Completed",
+                    icon: "checkmark.circle.fill",
+                    color: AppTheme.success,
+                    colorScheme: colorScheme
+                )
+
+                AnalyticStatBox(
+                    value: "\(Int(stats.hoursCompleted * 10) / 10)h",
+                    label: "Hours",
+                    icon: "clock.fill",
+                    color: AppTheme.accent,
+                    colorScheme: colorScheme
+                )
+
+                AnalyticStatBox(
+                    value: "\(Int(stats.completionRate * 100))%",
+                    label: "Rate",
+                    icon: "percent",
+                    color: Color(hex: "9B5DE5"),
+                    colorScheme: colorScheme
+                )
+            }
+        }
+        .padding(16)
+        .background(AppTheme.cardBackground(colorScheme))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+}
+
+struct AnalyticStatBox: View {
+    let value: String
+    let label: String
+    let icon: String
+    let color: Color
+    let colorScheme: ColorScheme
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 18))
+                .foregroundColor(color)
+
+            Text(value)
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .foregroundColor(AppTheme.primaryText(colorScheme))
+
+            Text(label)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(AppTheme.tertiaryText(colorScheme))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(color.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+// MARK: - Best Performance Card
+
+struct BestPerformanceCard: View {
+    let stats: WeeklyStats
+    let colorScheme: ColorScheme
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 8) {
+                Image(systemName: "star.fill")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(AppTheme.warning)
+                Text("BEST PERFORMANCE")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(AppTheme.secondaryText(colorScheme))
+                    .tracking(1)
+            }
+
+            HStack(spacing: 20) {
+                if let bestDay = stats.bestDay {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Best Day")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(AppTheme.secondaryText(colorScheme))
+                        Text(bestDay)
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(AppTheme.primaryText(colorScheme))
+                    }
+                }
+
+                Divider()
+                    .frame(height: 40)
+
+                if let hour = stats.mostProductiveHour {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Peak Hour")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(AppTheme.secondaryText(colorScheme))
+                        Text(formatHour(hour))
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(AppTheme.primaryText(colorScheme))
+                    }
+                }
+
+                Spacer()
+            }
+        }
+        .padding(16)
+        .background(AppTheme.cardBackground(colorScheme))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private func formatHour(_ hour: Int) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "ha"
+        var components = DateComponents()
+        components.hour = hour
+        if let date = Calendar.current.date(from: components) {
+            return formatter.string(from: date)
+        }
+        return "\(hour):00"
+    }
+}
+
+// MARK: - Weekly Comparison Chart
+
+struct WeeklyComparisonChart: View {
+    let goal: IdentityGoal
+    @ObservedObject var dataService: DataService
+    let colorScheme: ColorScheme
+
+    var weeklyData: [(week: String, rate: Double)] {
+        (0..<4).reversed().map { offset in
+            let stats = dataService.getWeeklyStats(for: goal, weekOffset: offset)
+            let weekLabel = offset == 0 ? "This Week" : (offset == 1 ? "Last Week" : "\(offset)w ago")
+            return (weekLabel, stats.completionRate)
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 8) {
+                Image(systemName: "chart.line.uptrend.xyaxis")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(AppTheme.accent)
+                Text("WEEKLY TREND")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(AppTheme.secondaryText(colorScheme))
+                    .tracking(1)
+            }
+
+            HStack(alignment: .bottom, spacing: 12) {
+                ForEach(weeklyData, id: \.week) { data in
+                    VStack(spacing: 6) {
+                        Text("\(Int(data.rate * 100))%")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(AppTheme.primaryText(colorScheme))
+
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(data.week == "This Week" ? AppTheme.accent : AppTheme.accent.opacity(0.4))
+                            .frame(width: 50, height: max(20, 80 * data.rate))
+
+                        Text(data.week)
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(AppTheme.tertiaryText(colorScheme))
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            .frame(height: 120)
+        }
+        .padding(16)
+        .background(AppTheme.cardBackground(colorScheme))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+}
+
+// MARK: - Locked Analytics Card
+
+struct LockedAnalyticsCard: View {
+    let colorScheme: ColorScheme
+    let onUpgrade: () -> Void
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 28))
+                .foregroundColor(AppTheme.tertiaryText(colorScheme))
+
+            Text("Unlock Deep Analytics")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundColor(AppTheme.primaryText(colorScheme))
+
+            Text("Get insights into your productivity patterns, best times to work, and AI recommendations")
+                .font(.system(size: 14, weight: .regular))
+                .foregroundColor(AppTheme.secondaryText(colorScheme))
+                .multilineTextAlignment(.center)
+
+            Button(action: onUpgrade) {
+                Text("Upgrade to Pro")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                    .background(AppTheme.accent)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            }
+        }
+        .padding(24)
+        .background(AppTheme.cardBackground(colorScheme))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+}
+
+// MARK: - All Achievements View
+
+struct AllAchievementsView: View {
+    let achievements: [Achievement]
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.appColorScheme) private var colorScheme
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 24) {
+                    ForEach(AchievementCategory.allCases, id: \.self) { category in
+                        let categoryAchievements = achievements.filter {
+                            $0.achievementType.category == category
+                        }
+
+                        if !categoryAchievements.isEmpty {
+                            AchievementCategorySection(
+                                category: category,
+                                achievements: categoryAchievements,
+                                colorScheme: colorScheme
+                            )
+                        }
+                    }
+                }
+                .padding(16)
+            }
+            .background(AppTheme.background(colorScheme))
+            .navigationTitle("All Achievements")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") { dismiss() }
+                        .foregroundColor(AppTheme.accent)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Legacy Components (kept for compatibility)
 
 struct FutureHeaderView: View {
     let goalName: String
@@ -120,8 +660,6 @@ struct FutureHeaderView: View {
         .padding(.horizontal, 4)
     }
 }
-
-// MARK: - Quick Stats
 
 struct QuickStatsView: View {
     let streak: Int
@@ -185,8 +723,6 @@ struct QuickStatCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
-
-// MARK: - Milestones Card
 
 struct MilestonesCardView: View {
     let milestones: [Milestone]
@@ -266,8 +802,6 @@ struct MilestoneItemRow: View {
     }
 }
 
-// MARK: - Pro Features Card
-
 struct ProFeaturesCard: View {
     let colorScheme: ColorScheme
     let onUpgrade: () -> Void
@@ -292,7 +826,6 @@ struct ProFeaturesCard: View {
                     .foregroundColor(.white.opacity(0.8))
             }
 
-            // Features list
             VStack(spacing: 8) {
                 ProFeatureRow(icon: "brain.head.profile", text: "Weekly AI adaptation")
                 ProFeatureRow(icon: "chart.line.uptrend.xyaxis", text: "Progress insights")
@@ -302,7 +835,7 @@ struct ProFeaturesCard: View {
             Button(action: onUpgrade) {
                 Text("Upgrade to Pro")
                     .font(.headline)
-                    .foregroundColor(Color(hex: "6366F1"))
+                    .foregroundColor(AppTheme.accent)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
                     .background(.white)
@@ -335,8 +868,6 @@ struct ProFeatureRow: View {
     }
 }
 
-// MARK: - Insights Card (Pro)
-
 struct InsightsCardView: View {
     let weeklyStats: [WeeklyStatData]
     let colorScheme: ColorScheme
@@ -361,7 +892,6 @@ struct InsightsCardView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 20)
             } else {
-                // Simple bar chart
                 HStack(alignment: .bottom, spacing: 8) {
                     ForEach(weeklyStats.suffix(6)) { stat in
                         VStack(spacing: 4) {
@@ -388,8 +918,6 @@ struct InsightsCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
-
-// MARK: - Reflection Prompt Card
 
 struct ReflectionPromptCard: View {
     let colorScheme: ColorScheme

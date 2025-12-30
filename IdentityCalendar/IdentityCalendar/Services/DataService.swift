@@ -20,7 +20,10 @@ final class DataService: ObservableObject {
                 Milestone.self,
                 WeeklyTheme.self,
                 PlanBlock.self,
-                WeeklyReflection.self
+                WeeklyReflection.self,
+                Achievement.self,
+                BlockTemplate.self,
+                DailyEngagement.self
             ])
 
             let modelConfiguration = ModelConfiguration(
@@ -162,7 +165,8 @@ final class DataService: ObservableObject {
             goal.totalBlocksCompleted += 1
             updateStreak(for: goal, engaged: true)
         }
-        saveContext()
+        // Track engagement and check achievements
+        updateEngagementForBlockCompletion(block)
     }
 
     func skipBlock(_ block: PlanBlock) {
@@ -367,6 +371,422 @@ final class DataService: ObservableObject {
         guard let user = currentUser else { return }
         user.hasCompletedOnboarding = true
         saveContext()
+    }
+
+    // MARK: - Achievement Management
+
+    func initializeAchievements(for user: User) {
+        guard user.achievements.isEmpty else { return }
+
+        for type in AchievementType.allCases {
+            let achievement = Achievement(achievementType: type)
+            achievement.user = user
+            user.achievements.append(achievement)
+            modelContext.insert(achievement)
+        }
+        saveContext()
+    }
+
+    func checkAndUnlockAchievements(for user: User) {
+        guard let goal = user.activeGoal else { return }
+
+        var unlockedNew = false
+
+        for achievement in user.achievements where !achievement.isUnlocked {
+            let shouldUnlock = checkAchievementCondition(achievement, user: user, goal: goal)
+            if shouldUnlock {
+                achievement.unlock()
+                unlockedNew = true
+            }
+        }
+
+        if unlockedNew {
+            saveContext()
+        }
+    }
+
+    private func checkAchievementCondition(_ achievement: Achievement, user: User, goal: IdentityGoal) -> Bool {
+        let type = achievement.achievementType
+
+        switch type {
+        // Streak achievements
+        case .firstStep:
+            return goal.totalBlocksCompleted >= 1
+        case .weekWarrior:
+            return goal.currentStreak >= 7
+        case .twoWeekTitan:
+            return goal.currentStreak >= 14
+        case .monthlyMaster:
+            return goal.currentStreak >= 30
+        case .quarterChampion:
+            return goal.currentStreak >= 90
+
+        // Completion achievements
+        case .tenBlocks:
+            return user.totalBlocksEverCompleted >= 10
+        case .fiftyBlocks:
+            return user.totalBlocksEverCompleted >= 50
+        case .hundredBlocks:
+            return user.totalBlocksEverCompleted >= 100
+        case .fiveHundredBlocks:
+            return user.totalBlocksEverCompleted >= 500
+
+        // Time-based achievements
+        case .earlyBird:
+            let earlyBlocks = countEarlyMorningBlocks(for: goal)
+            achievement.progress = earlyBlocks
+            return earlyBlocks >= 5
+        case .nightOwl:
+            let nightBlocks = countNightBlocks(for: goal)
+            achievement.progress = nightBlocks
+            return nightBlocks >= 5
+        case .weekendWarrior:
+            let weekendCount = countWeekendEngagements(for: user)
+            achievement.progress = weekendCount
+            return weekendCount >= 4
+
+        // Milestone achievements
+        case .firstMilestone:
+            return goal.milestones.contains { $0.isCompleted }
+        case .halfwayHero:
+            return calculateProgress(for: goal) >= 0.5
+        case .goalGetter:
+            return user.totalGoalsCompleted >= 1
+
+        // Engagement achievements
+        case .reflector:
+            let reflectionCount = goal.reflections.count
+            achievement.progress = reflectionCount
+            return reflectionCount >= 4
+        case .adapter:
+            let adaptCount = countAdaptations(for: goal)
+            achievement.progress = adaptCount
+            return adaptCount >= 10
+        case .perfectWeek:
+            return hasPerfectWeek(for: goal)
+
+        // Special achievements
+        case .newYearNewYou:
+            let calendar = Calendar.current
+            let isJanFirst = calendar.component(.month, from: Date()) == 1 &&
+                             calendar.component(.day, from: Date()) == 1
+            return isJanFirst && goal.totalBlocksCompleted > 0
+        case .comebackKid:
+            return checkComebackKid(for: user)
+        }
+    }
+
+    private func countEarlyMorningBlocks(for goal: IdentityGoal) -> Int {
+        goal.planBlocks.filter { block in
+            block.status == .completed &&
+            Calendar.current.component(.hour, from: block.startDateTime) < 8
+        }.count
+    }
+
+    private func countNightBlocks(for goal: IdentityGoal) -> Int {
+        goal.planBlocks.filter { block in
+            block.status == .completed &&
+            Calendar.current.component(.hour, from: block.startDateTime) >= 20
+        }.count
+    }
+
+    private func countWeekendEngagements(for user: User) -> Int {
+        let weekendEngagements = user.dailyEngagements.filter { engagement in
+            engagement.isWeekend && engagement.blocksCompleted > 0
+        }
+        // Count unique weekends
+        var weekends = Set<String>()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-ww"
+        for engagement in weekendEngagements {
+            weekends.insert(formatter.string(from: engagement.date))
+        }
+        return weekends.count
+    }
+
+    private func countAdaptations(for goal: IdentityGoal) -> Int {
+        goal.planBlocks.filter { $0.wasMoved || $0.wasReduced }.count
+    }
+
+    private func hasPerfectWeek(for goal: IdentityGoal) -> Bool {
+        let calendar = Calendar.current
+        guard let weekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())),
+              let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart) else {
+            return false
+        }
+
+        let weekBlocks = goal.planBlocks.filter { block in
+            block.startDateTime >= weekStart && block.startDateTime < weekEnd
+        }
+
+        guard !weekBlocks.isEmpty else { return false }
+        return weekBlocks.allSatisfy { $0.status == .completed }
+    }
+
+    private func checkComebackKid(for user: User) -> Bool {
+        guard let lastEngagement = user.lastEngagementDate else { return false }
+        let daysSinceEngagement = Calendar.current.dateComponents(
+            [.day],
+            from: lastEngagement,
+            to: Date()
+        ).day ?? 0
+        return daysSinceEngagement >= 7
+    }
+
+    func getAchievement(type: AchievementType, for user: User) -> Achievement? {
+        user.achievements.first { $0.achievementType == type }
+    }
+
+    // MARK: - Block Template Management
+
+    func createTemplate(
+        title: String,
+        intentShort: String,
+        blockType: BlockType,
+        durationMinutes: Int,
+        location: String? = nil,
+        notes: String? = nil,
+        isRecurring: Bool = false,
+        recurrencePattern: RecurrencePattern? = nil,
+        recurrenceDays: [Int]? = nil,
+        preferredTimeHour: Int? = nil,
+        preferredTimeMinute: Int? = nil
+    ) -> BlockTemplate {
+        let user = getOrCreateUser()
+
+        let template = BlockTemplate(
+            title: title,
+            intentShort: intentShort,
+            blockType: blockType,
+            durationMinutes: durationMinutes,
+            location: location,
+            notes: notes,
+            isRecurring: isRecurring,
+            recurrencePattern: recurrencePattern,
+            recurrenceDays: recurrenceDays,
+            preferredTimeHour: preferredTimeHour,
+            preferredTimeMinute: preferredTimeMinute
+        )
+
+        template.user = user
+        user.blockTemplates.append(template)
+        modelContext.insert(template)
+        saveContext()
+
+        return template
+    }
+
+    func createBlockFromTemplate(_ template: BlockTemplate, for date: Date, goal: IdentityGoal) -> PlanBlock {
+        let block = template.createBlock(for: date, weekNumber: currentWeekNumber(for: goal))
+        addBlocks([block], to: goal)
+        return block
+    }
+
+    func toggleTemplateFavorite(_ template: BlockTemplate) {
+        template.isFavorite.toggle()
+        saveContext()
+    }
+
+    func deleteTemplate(_ template: BlockTemplate) {
+        modelContext.delete(template)
+        saveContext()
+    }
+
+    func updateTemplate(_ template: BlockTemplate) {
+        saveContext()
+    }
+
+    private func currentWeekNumber(for goal: IdentityGoal) -> Int {
+        let daysSinceStart = Calendar.current.dateComponents(
+            [.day],
+            from: goal.createdAt,
+            to: Date()
+        ).day ?? 0
+        return (daysSinceStart / 7) + 1
+    }
+
+    // MARK: - Recurring Block Generation
+
+    func generateRecurringBlocks(from template: BlockTemplate, for goal: IdentityGoal, weeks: Int = 4) {
+        guard template.isRecurring else { return }
+
+        let occurrences = template.nextOccurrences(from: Date(), count: weeks * 7)
+
+        for date in occurrences {
+            let weekNumber = currentWeekNumber(for: goal)
+            let block = template.createBlock(for: date, weekNumber: weekNumber)
+            block.goal = goal
+            goal.planBlocks.append(block)
+            modelContext.insert(block)
+        }
+
+        saveContext()
+    }
+
+    // MARK: - Daily Engagement Tracking
+
+    func recordDailyEngagement() {
+        guard let user = currentUser else { return }
+
+        let today = Calendar.current.startOfDay(for: Date())
+
+        // Check if we already have an engagement for today
+        if let existing = user.dailyEngagements.first(where: {
+            Calendar.current.isDate($0.date, inSameDayAs: today)
+        }) {
+            existing.engagedWithApp = true
+            saveContext()
+            return
+        }
+
+        // Create new engagement record
+        let engagement = DailyEngagement(date: today)
+        engagement.user = user
+        user.dailyEngagements.append(engagement)
+        modelContext.insert(engagement)
+
+        // Update user stats
+        user.appOpenCount += 1
+        user.lastEngagementDate = Date()
+
+        saveContext()
+
+        // Check achievements
+        checkAndUnlockAchievements(for: user)
+    }
+
+    func getTodayEngagement() -> DailyEngagement? {
+        guard let user = currentUser else { return nil }
+        let today = Calendar.current.startOfDay(for: Date())
+        return user.dailyEngagements.first {
+            Calendar.current.isDate($0.date, inSameDayAs: today)
+        }
+    }
+
+    func getOrCreateTodayEngagement() -> DailyEngagement {
+        if let existing = getTodayEngagement() {
+            return existing
+        }
+
+        let user = getOrCreateUser()
+        let today = Calendar.current.startOfDay(for: Date())
+        let engagement = DailyEngagement(date: today)
+        engagement.user = user
+        user.dailyEngagements.append(engagement)
+        modelContext.insert(engagement)
+        saveContext()
+        return engagement
+    }
+
+    func updateEngagementForBlockCompletion(_ block: PlanBlock) {
+        let engagement = getOrCreateTodayEngagement()
+        engagement.recordBlockCompletion(block: block)
+
+        if let user = currentUser {
+            user.totalBlocksEverCompleted += 1
+            checkAndUnlockAchievements(for: user)
+        }
+
+        saveContext()
+    }
+
+    // MARK: - Analytics
+
+    func getWeeklyStats(for goal: IdentityGoal, weekOffset: Int = 0) -> WeeklyStats {
+        let calendar = Calendar.current
+        let today = Date()
+
+        guard let weekStart = calendar.date(byAdding: .weekOfYear, value: -weekOffset, to: today),
+              let adjustedWeekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: weekStart)),
+              let weekEnd = calendar.date(byAdding: .day, value: 7, to: adjustedWeekStart) else {
+            return WeeklyStats(weekStart: today, totalBlocks: 0, completedBlocks: 0,
+                             skippedBlocks: 0, totalMinutes: 0, averageCompletionRate: 0,
+                             bestDay: nil, mostProductiveHour: nil)
+        }
+
+        let weekBlocks = blocksForDateRange(start: adjustedWeekStart, end: weekEnd, goal: goal)
+        let completedBlocks = weekBlocks.filter { $0.status == .completed }
+        let skippedBlocks = weekBlocks.filter { $0.status == .skipped }
+
+        let totalMinutes = completedBlocks.reduce(0) { $0 + $1.durationMinutes }
+
+        // Find best day
+        var dayCompletions: [Int: Int] = [:]
+        for block in completedBlocks {
+            let weekday = calendar.component(.weekday, from: block.startDateTime)
+            dayCompletions[weekday, default: 0] += 1
+        }
+        let bestDayNumber = dayCompletions.max(by: { $0.value < $1.value })?.key
+        let bestDay = bestDayNumber.map { calendar.weekdaySymbols[$0 - 1] }
+
+        // Find most productive hour
+        var hourCompletions: [Int: Int] = [:]
+        for block in completedBlocks {
+            let hour = calendar.component(.hour, from: block.startDateTime)
+            hourCompletions[hour, default: 0] += 1
+        }
+        let mostProductiveHour = hourCompletions.max(by: { $0.value < $1.value })?.key
+
+        let completionRate = weekBlocks.isEmpty ? 0.0 : Double(completedBlocks.count) / Double(weekBlocks.count)
+
+        return WeeklyStats(
+            weekStart: adjustedWeekStart,
+            totalBlocks: weekBlocks.count,
+            completedBlocks: completedBlocks.count,
+            skippedBlocks: skippedBlocks.count,
+            totalMinutes: totalMinutes,
+            averageCompletionRate: completionRate,
+            bestDay: bestDay,
+            mostProductiveHour: mostProductiveHour
+        )
+    }
+
+    func getStreakInfo(for goal: IdentityGoal) -> StreakInfo {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        // Check if engaged today
+        let todayBlocks = blocksForDate(today, goal: goal)
+        let isActiveToday = todayBlocks.contains { $0.status == .completed }
+
+        // Find streak start date (simplified - in production you'd track this properly)
+        var streakStartDate: Date? = nil
+        if goal.currentStreak > 0 {
+            streakStartDate = calendar.date(byAdding: .day, value: -(goal.currentStreak - 1), to: today)
+        }
+
+        // Find last active date
+        let lastActive = goal.planBlocks
+            .filter { $0.status == .completed }
+            .max(by: { $0.completedAt ?? .distantPast < $1.completedAt ?? .distantPast })?
+            .completedAt
+
+        return StreakInfo(
+            currentStreak: goal.currentStreak,
+            longestStreak: goal.longestStreak,
+            lastActiveDate: lastActive,
+            streakStartDate: streakStartDate,
+            isActiveToday: isActiveToday
+        )
+    }
+
+    func getProgressRings(for goal: IdentityGoal) -> [ProgressRingData] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        // Today's progress
+        let todayBlocks = blocksForDate(today, goal: goal)
+        let todayCompleted = todayBlocks.filter { $0.status == .completed }.count
+        let dailyRing = ProgressRingData.daily(completed: todayCompleted, scheduled: todayBlocks.count)
+
+        // Weekly progress
+        let weekStats = getWeeklyStats(for: goal)
+        let weeklyRing = ProgressRingData.weekly(completed: weekStats.completedBlocks, scheduled: weekStats.totalBlocks)
+
+        // Streak
+        let streakRing = ProgressRingData.streak(current: goal.currentStreak)
+
+        return [dailyRing, weeklyRing, streakRing]
     }
 
     // MARK: - Persistence

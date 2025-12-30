@@ -16,12 +16,47 @@ final class User {
     var quietHoursStart: Date?
     var quietHoursEnd: Date?
 
+    // Streak tracking (global across all goals)
+    var lastEngagementDate: Date?
+    var totalBlocksEverCompleted: Int
+    var totalGoalsCompleted: Int
+    var appOpenCount: Int
+
     // Relationships
     @Relationship(deleteRule: .cascade)
     var goals: [IdentityGoal]
 
+    @Relationship(deleteRule: .cascade)
+    var achievements: [Achievement]
+
+    @Relationship(deleteRule: .cascade)
+    var blockTemplates: [BlockTemplate]
+
+    @Relationship(deleteRule: .cascade)
+    var dailyEngagements: [DailyEngagement]
+
     var activeGoal: IdentityGoal? {
         goals.first { $0.status == .active }
+    }
+
+    var unlockedAchievements: [Achievement] {
+        achievements.filter { $0.isUnlocked }
+    }
+
+    var newAchievements: [Achievement] {
+        achievements.filter { $0.isNew }
+    }
+
+    var favoriteTemplates: [BlockTemplate] {
+        blockTemplates.filter { $0.isFavorite }.sorted { $0.timesUsed > $1.timesUsed }
+    }
+
+    var recentTemplates: [BlockTemplate] {
+        blockTemplates
+            .filter { $0.lastUsedAt != nil }
+            .sorted { ($0.lastUsedAt ?? .distantPast) > ($1.lastUsedAt ?? .distantPast) }
+            .prefix(5)
+            .map { $0 }
     }
 
     init(
@@ -34,7 +69,14 @@ final class User {
         reflectionRemindersEnabled: Bool = true,
         quietHoursStart: Date? = nil,
         quietHoursEnd: Date? = nil,
-        goals: [IdentityGoal] = []
+        lastEngagementDate: Date? = nil,
+        totalBlocksEverCompleted: Int = 0,
+        totalGoalsCompleted: Int = 0,
+        appOpenCount: Int = 0,
+        goals: [IdentityGoal] = [],
+        achievements: [Achievement] = [],
+        blockTemplates: [BlockTemplate] = [],
+        dailyEngagements: [DailyEngagement] = []
     ) {
         self.id = id
         self.createdAt = createdAt
@@ -45,7 +87,14 @@ final class User {
         self.reflectionRemindersEnabled = reflectionRemindersEnabled
         self.quietHoursStart = quietHoursStart
         self.quietHoursEnd = quietHoursEnd
+        self.lastEngagementDate = lastEngagementDate
+        self.totalBlocksEverCompleted = totalBlocksEverCompleted
+        self.totalGoalsCompleted = totalGoalsCompleted
+        self.appOpenCount = appOpenCount
         self.goals = goals
+        self.achievements = achievements
+        self.blockTemplates = blockTemplates
+        self.dailyEngagements = dailyEngagements
     }
 }
 
