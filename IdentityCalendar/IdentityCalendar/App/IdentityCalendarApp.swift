@@ -37,11 +37,11 @@ struct RootView: View {
             if isLoading {
                 LaunchView(colorScheme: colorScheme)
             } else if showOnboarding {
-                NewOnboardingView {
+                NewOnboardingView(onComplete: {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         showOnboarding = false
                     }
-                }
+                })
                 .transition(.opacity)
             } else {
                 MainTabView()

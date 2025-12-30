@@ -8,6 +8,10 @@ struct NewOnboardingView: View {
 
     var onComplete: (() -> Void)?
 
+    init(onComplete: (() -> Void)? = nil) {
+        self.onComplete = onComplete
+    }
+
     var body: some View {
         ZStack {
             AppTheme.background(appColorScheme)
@@ -43,7 +47,9 @@ struct NewOnboardingView: View {
                         plan: viewModel.generatedPlan,
                         onAccept: {
                             viewModel.acceptPlan()
-                            onComplete?()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                onComplete?()
+                            }
                         },
                         onRegenerate: viewModel.regeneratePlan
                     )

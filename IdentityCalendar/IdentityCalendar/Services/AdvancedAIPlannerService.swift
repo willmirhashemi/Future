@@ -1494,15 +1494,29 @@ final class ScheduleOptimizer {
         }
 
         // Get phase-appropriate and ongoing activities
-        let appropriateActivities = domainPlan.activities.filter { activity in
+        var appropriateActivities = domainPlan.activities.filter { activity in
             activity.phase == .ongoing || activity.phase == currentPhase
         }
 
+        // If no phase-specific activities, use all activities
+        if appropriateActivities.isEmpty {
+            appropriateActivities = domainPlan.activities
+        }
+
+        // Still empty? Return empty
+        guard !appropriateActivities.isEmpty else { return [] }
+
         // Build the week's schedule based on frequency
         var activityCounts: [String: Int] = [:]
+        var maxIterations = totalActivitiesNeeded * 3 // Safety limit
 
-        while selected.count < totalActivitiesNeeded {
+        while selected.count < totalActivitiesNeeded && maxIterations > 0 {
+            maxIterations -= 1
+            var addedAny = false
+
             for activity in appropriateActivities {
+                guard selected.count < totalActivitiesNeeded else { break }
+
                 let currentCount = activityCounts[activity.title] ?? 0
                 let maxCount: Int
 
@@ -1513,14 +1527,20 @@ final class ScheduleOptimizer {
                     maxCount = times
                 }
 
-                if currentCount < maxCount && selected.count < totalActivitiesNeeded {
+                if currentCount < maxCount {
                     selected.append(activity)
                     activityCounts[activity.title] = currentCount + 1
+                    addedAny = true
                 }
             }
 
-            // Prevent infinite loop
-            if appropriateActivities.isEmpty { break }
+            // If we couldn't add anything, cycle through again allowing repeats
+            if !addedAny {
+                // Allow repeats of any activity
+                if let randomActivity = appropriateActivities.randomElement() {
+                    selected.append(randomActivity)
+                }
+            }
         }
 
         // Shuffle to add variety
