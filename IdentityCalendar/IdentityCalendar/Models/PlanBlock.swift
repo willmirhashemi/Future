@@ -19,6 +19,18 @@ final class PlanBlock {
     var intentShort: String
     var blockType: BlockType
 
+    // Rich Content (Optional)
+    var location: String?
+    var notes: String?
+    var zoomLink: String?
+    var youtubeLink: String?
+    var resourceLinks: [String]?
+    var reminder: Int? // Minutes before to remind
+    var category: String? // Optional category tag
+    var priority: BlockPriority?
+    var energyLevel: EnergyLevel?
+    var tips: [String]? // AI-generated tips for this activity
+
     // Status
     var status: BlockStatus
     var completedAt: Date?
@@ -71,7 +83,17 @@ final class PlanBlock {
         intentShort: String,
         blockType: BlockType,
         status: BlockStatus = .scheduled,
-        weekNumber: Int = 1
+        weekNumber: Int = 1,
+        location: String? = nil,
+        notes: String? = nil,
+        zoomLink: String? = nil,
+        youtubeLink: String? = nil,
+        resourceLinks: [String]? = nil,
+        reminder: Int? = nil,
+        category: String? = nil,
+        priority: BlockPriority? = nil,
+        energyLevel: EnergyLevel? = nil,
+        tips: [String]? = nil
     ) {
         self.id = id
         self.createdAt = createdAt
@@ -91,6 +113,17 @@ final class PlanBlock {
         self.wasMoved = false
         self.moveCount = 0
         self.weekNumber = weekNumber
+        // Rich content
+        self.location = location
+        self.notes = notes
+        self.zoomLink = zoomLink
+        self.youtubeLink = youtubeLink
+        self.resourceLinks = resourceLinks
+        self.reminder = reminder
+        self.category = category
+        self.priority = priority
+        self.energyLevel = energyLevel
+        self.tips = tips
     }
 
     // MARK: - Actions
@@ -204,6 +237,82 @@ enum BlockStatus: String, Codable {
         case .completed: return "checkmark.circle.fill"
         case .skipped: return "forward.fill"
         case .missed: return "minus.circle"
+        }
+    }
+}
+
+// MARK: - Block Priority
+
+enum BlockPriority: String, Codable, CaseIterable {
+    case low = "low"
+    case medium = "medium"
+    case high = "high"
+    case critical = "critical"
+
+    var displayName: String {
+        switch self {
+        case .low: return "Low"
+        case .medium: return "Medium"
+        case .high: return "High"
+        case .critical: return "Critical"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .low: return "flag"
+        case .medium: return "flag.fill"
+        case .high: return "exclamationmark.triangle"
+        case .critical: return "exclamationmark.triangle.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .low: return .gray
+        case .medium: return .blue
+        case .high: return .orange
+        case .critical: return .red
+        }
+    }
+}
+
+// MARK: - Energy Level
+
+enum EnergyLevel: String, Codable, CaseIterable {
+    case low = "low"
+    case medium = "medium"
+    case high = "high"
+
+    var displayName: String {
+        switch self {
+        case .low: return "Low Energy"
+        case .medium: return "Medium Energy"
+        case .high: return "High Energy"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .low: return "battery.25"
+        case .medium: return "battery.50"
+        case .high: return "battery.100"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .low: return Color(hex: "9B5DE5") // Purple for rest
+        case .medium: return Color(hex: "00B4D8") // Blue for moderate
+        case .high: return Color(hex: "00D9A5") // Green for high
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .low: return "Good for when you're tired"
+        case .medium: return "Moderate focus required"
+        case .high: return "Peak energy recommended"
         }
     }
 }

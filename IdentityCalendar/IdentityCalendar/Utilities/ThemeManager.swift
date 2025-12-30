@@ -26,25 +26,25 @@ final class ThemeManager: ObservableObject {
     }
 }
 
-// MARK: - Theme Colors
+// MARK: - Theme Colors (WHOOP-inspired dark aesthetic)
 
 struct AppTheme {
-    // MARK: - Dynamic Colors
+    // MARK: - Dynamic Colors (Deep black backgrounds like WHOOP)
 
     static func background(_ colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? Color(hex: "0D0D0F") : Color(hex: "F8F9FA")
+        colorScheme == .dark ? Color(hex: "000000") : Color(hex: "F8F9FA")
     }
 
     static func cardBackground(_ colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? Color(hex: "1A1A1E") : Color.white
+        colorScheme == .dark ? Color(hex: "0F0F0F") : Color.white
     }
 
     static func secondaryBackground(_ colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? Color(hex: "252529") : Color(hex: "F0F1F3")
+        colorScheme == .dark ? Color(hex: "1A1A1A") : Color(hex: "F0F1F3")
     }
 
     static func tertiaryBackground(_ colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? Color(hex: "2D2D32") : Color(hex: "E8E9EB")
+        colorScheme == .dark ? Color(hex: "242424") : Color(hex: "E8E9EB")
     }
 
     static func primaryText(_ colorScheme: ColorScheme) -> Color {
@@ -52,41 +52,48 @@ struct AppTheme {
     }
 
     static func secondaryText(_ colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? Color(hex: "8E8E93") : Color(hex: "6B6B70")
+        colorScheme == .dark ? Color(hex: "9A9A9A") : Color(hex: "6B6B70")
     }
 
     static func tertiaryText(_ colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? Color(hex: "636366") : Color(hex: "9A9A9E")
+        colorScheme == .dark ? Color(hex: "666666") : Color(hex: "9A9A9E")
     }
 
     static func separator(_ colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? Color(hex: "38383A") : Color(hex: "E0E0E2")
+        colorScheme == .dark ? Color(hex: "2A2A2A") : Color(hex: "E0E0E2")
     }
 
-    // MARK: - Accent Colors (Same for both modes)
+    // MARK: - Accent Colors (WHOOP-style mint/teal green)
 
-    static let accent = Color(hex: "3B82F6") // Blue
-    static let accentLight = Color(hex: "60A5FA")
-    static let success = Color(hex: "22C55E") // Green
-    static let warning = Color(hex: "F59E0B") // Amber
-    static let error = Color(hex: "EF4444") // Red
+    static let accent = Color(hex: "00D9A5") // WHOOP mint green
+    static let accentLight = Color(hex: "00F5B8") // Lighter mint
+    static let accentDark = Color(hex: "00B88A") // Darker mint for contrast
+    static let success = Color(hex: "00D9A5") // Same as accent (green = success)
+    static let warning = Color(hex: "FFB020") // Warm amber
+    static let error = Color(hex: "FF4757") // Soft red
 
-    // MARK: - Block Colors
+    // MARK: - Additional WHOOP-style colors
+
+    static let strain = Color(hex: "00B4D8") // Blue for strain/effort metrics
+    static let recovery = Color(hex: "00D9A5") // Green for recovery/progress
+    static let sleep = Color(hex: "9B5DE5") // Purple for rest/sleep
+
+    // MARK: - Block Colors (More vibrant for dark backgrounds)
 
     static func blockFocus(_ colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? Color(hex: "3B82F6") : Color(hex: "2563EB")
+        colorScheme == .dark ? Color(hex: "00D9A5") : Color(hex: "00B88A")
     }
 
     static func blockLight(_ colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? Color(hex: "10B981") : Color(hex: "059669")
+        colorScheme == .dark ? Color(hex: "00B4D8") : Color(hex: "0096B4")
     }
 
     static func blockHabit(_ colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? Color(hex: "F59E0B") : Color(hex: "D97706")
+        colorScheme == .dark ? Color(hex: "FFB020") : Color(hex: "E69D00")
     }
 
     static func blockReview(_ colorScheme: ColorScheme) -> Color {
-        colorScheme == .dark ? Color(hex: "8B5CF6") : Color(hex: "7C3AED")
+        colorScheme == .dark ? Color(hex: "9B5DE5") : Color(hex: "8347D1")
     }
 
     // MARK: - Gradients
@@ -112,11 +119,21 @@ struct AppTheme {
 
     static var premiumGradient: LinearGradient {
         LinearGradient(
-            colors: [Color(hex: "6366F1"), Color(hex: "8B5CF6")],
+            colors: [Color(hex: "00D9A5"), Color(hex: "00B4D8")],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
     }
+
+    // MARK: - Ring/Progress Colors (WHOOP-style circular metrics)
+
+    static func ringBackground(_ colorScheme: ColorScheme) -> Color {
+        colorScheme == .dark ? Color(hex: "1A1A1A") : Color(hex: "E8E9EB")
+    }
+
+    static let ringProgress = Color(hex: "00D9A5")
+    static let ringSecondary = Color(hex: "00B4D8")
+    static let ringTertiary = Color(hex: "9B5DE5")
 }
 
 // MARK: - Environment Key

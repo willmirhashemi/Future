@@ -204,11 +204,17 @@ final class GoalNLPParser {
         .finance: Set(["investment banking", "finance", "trading", "analyst", "banking", "wall street", "private equity", "hedge fund", "m&a", "ib", "valuation", "financial modeling", "dcf", "lbo"]),
         .technology: Set(["software", "developer", "programming", "coding", "engineer", "tech", "computer science", "app", "web", "mobile", "ai", "machine learning", "data science", "startup"]),
         .academia: Set(["study", "student", "exam", "degree", "university", "college", "gpa", "research", "thesis", "graduate", "phd", "masters", "professor", "academic"]),
-        .fitness: Set(["fitness", "workout", "gym", "muscle", "weight", "health", "training", "exercise", "run", "marathon", "athletic", "sport", "body", "strength"]),
+        .fitness: Set(["fitness", "workout", "gym", "muscle", "training", "exercise", "run", "marathon", "athletic", "sport", "strength", "lift", "crossfit", "hiit"]),
         .business: Set(["entrepreneur", "business", "startup", "founder", "company", "revenue", "sales", "marketing", "growth", "customers", "product", "market", "launch"]),
         .creative: Set(["art", "music", "writing", "design", "creative", "portfolio", "artist", "musician", "writer", "content", "youtube", "social media", "brand"]),
         .language: Set(["language", "spanish", "french", "chinese", "japanese", "fluent", "speak", "learn language", "bilingual", "conversation"]),
-        .career: Set(["job", "career", "internship", "interview", "resume", "networking", "promotion", "salary", "offer", "hire", "recruit", "linkedin"])
+        .career: Set(["job", "career", "internship", "interview", "resume", "networking", "promotion", "salary", "offer", "hire", "recruit", "linkedin"]),
+        .income: Set(["make money", "earn", "income", "side hustle", "freelance", "passive income", "$", "dollar", "thousand", "profit", "monetize", "gig", "extra income", "financial goal", "savings goal", "10000", "5000", "1000", "rich", "wealth"]),
+        .weightLoss: Set(["lose weight", "weight loss", "fat loss", "slim", "diet", "calories", "pounds", "kg", "bmi", "lean", "cut", "shred", "body fat", "obesity", "overweight", "belly fat", "waist"]),
+        .health: Set(["health", "healthy", "wellness", "longevity", "nutrition", "sleep", "energy", "vitality", "immune", "doctor", "medical", "lifestyle", "wellbeing", "recovery", "heal"]),
+        .productivity: Set(["productivity", "productive", "time management", "efficiency", "organize", "focus", "discipline", "routine", "habit", "procrastination", "morning routine", "schedule", "optimize"]),
+        .relationship: Set(["relationship", "dating", "social", "friends", "communication", "confidence", "charisma", "networking", "connection", "people skills", "public speaking"]),
+        .mindfulness: Set(["meditation", "mindfulness", "mental health", "anxiety", "stress", "calm", "peace", "therapy", "self-care", "journal", "gratitude", "awareness", "breathing", "yoga"])
     ]
 
     // Intensity signal words
@@ -424,6 +430,18 @@ final class DomainIntelligence {
             return generateLanguagePlan(parsedGoal)
         case .career:
             return generateCareerPlan(parsedGoal)
+        case .income:
+            return generateIncomePlan(parsedGoal)
+        case .weightLoss:
+            return generateWeightLossPlan(parsedGoal)
+        case .health:
+            return generateHealthPlan(parsedGoal)
+        case .productivity:
+            return generateProductivityPlan(parsedGoal)
+        case .relationship:
+            return generateRelationshipPlan(parsedGoal)
+        case .mindfulness:
+            return generateMindfulnessPlan(parsedGoal)
         case .general:
             return generateGeneralPlan(parsedGoal)
         }
@@ -1219,6 +1237,600 @@ final class DomainIntelligence {
         )
     }
 
+    // MARK: - Income/Money Making Plan
+
+    private func generateIncomePlan(_ parsedGoal: ParsedGoalAnalysis) -> DomainPlan {
+        let activities: [DomainActivity] = [
+            DomainActivity(
+                title: "Income Strategy Session",
+                intent: "Plan and review income streams",
+                blockType: .focus,
+                duration: 45,
+                frequency: .timesPerWeek(2),
+                phase: .early,
+                skillCategory: "Strategy"
+            ),
+            DomainActivity(
+                title: "Skill Building",
+                intent: "Develop marketable skills",
+                blockType: .focus,
+                duration: 60,
+                frequency: .timesPerWeek(4),
+                phase: .ongoing,
+                skillCategory: "Skills"
+            ),
+            DomainActivity(
+                title: "Client Outreach",
+                intent: "Find and connect with potential clients",
+                blockType: .focus,
+                duration: 45,
+                frequency: .daily,
+                phase: .middle,
+                skillCategory: "Sales"
+            ),
+            DomainActivity(
+                title: "Financial Tracking",
+                intent: "Track income, expenses, progress",
+                blockType: .habit,
+                duration: 15,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Finance"
+            ),
+            DomainActivity(
+                title: "Project Work",
+                intent: "Execute income-generating work",
+                blockType: .focus,
+                duration: 90,
+                frequency: .timesPerWeek(5),
+                phase: .ongoing,
+                skillCategory: "Execution"
+            ),
+            DomainActivity(
+                title: "Market Research",
+                intent: "Find opportunities and trends",
+                blockType: .light,
+                duration: 30,
+                frequency: .timesPerWeek(2),
+                phase: .ongoing,
+                skillCategory: "Research"
+            ),
+            DomainActivity(
+                title: "Network Building",
+                intent: "Connect with potential partners",
+                blockType: .habit,
+                duration: 30,
+                frequency: .timesPerWeek(3),
+                phase: .ongoing,
+                skillCategory: "Networking"
+            )
+        ]
+
+        let milestones = [
+            DomainMilestone(title: "Strategy Clear", description: "Income plan defined", weekRatio: 0.1),
+            DomainMilestone(title: "First Revenue", description: "Initial income generated", weekRatio: 0.25),
+            DomainMilestone(title: "Momentum Building", description: "Consistent income flow", weekRatio: 0.5),
+            DomainMilestone(title: "Scaling Up", description: "Growing income streams", weekRatio: 0.75),
+            DomainMilestone(title: "Goal Achieved", description: "Target income reached", weekRatio: 1.0)
+        ]
+
+        let themes = [
+            DomainTheme(title: "Foundation", focus: "Strategy and skills", phaseRatio: 0.0...0.2),
+            DomainTheme(title: "Activation", focus: "Start earning", phaseRatio: 0.2...0.4),
+            DomainTheme(title: "Optimization", focus: "Improve efficiency", phaseRatio: 0.4...0.6),
+            DomainTheme(title: "Scaling", focus: "Grow income", phaseRatio: 0.6...0.8),
+            DomainTheme(title: "Sustaining", focus: "Maintain momentum", phaseRatio: 0.8...1.0)
+        ]
+
+        return DomainPlan(
+            activities: activities,
+            keyMilestones: milestones,
+            weeklyThemes: themes,
+            baseBlocksPerWeek: calculateBaseBlocks(parsedGoal),
+            energyDistribution: .flexible,
+            restDays: [.sunday],
+            specialConsiderations: ["Focus on high-value activities", "Track every dollar", "Iterate quickly"]
+        )
+    }
+
+    // MARK: - Weight Loss Plan
+
+    private func generateWeightLossPlan(_ parsedGoal: ParsedGoalAnalysis) -> DomainPlan {
+        let activities: [DomainActivity] = [
+            DomainActivity(
+                title: "Workout Session",
+                intent: "Burn calories and build muscle",
+                blockType: .focus,
+                duration: 45,
+                frequency: .timesPerWeek(4),
+                phase: .ongoing,
+                skillCategory: "Exercise"
+            ),
+            DomainActivity(
+                title: "Cardio Training",
+                intent: "Cardiovascular exercise for fat loss",
+                blockType: .focus,
+                duration: 30,
+                frequency: .timesPerWeek(3),
+                phase: .ongoing,
+                skillCategory: "Exercise"
+            ),
+            DomainActivity(
+                title: "Meal Prep",
+                intent: "Prepare healthy meals for the week",
+                blockType: .habit,
+                duration: 60,
+                frequency: .timesPerWeek(2),
+                phase: .ongoing,
+                skillCategory: "Nutrition"
+            ),
+            DomainActivity(
+                title: "Food Logging",
+                intent: "Track calories and macros",
+                blockType: .habit,
+                duration: 10,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Tracking"
+            ),
+            DomainActivity(
+                title: "Weigh-In & Measurements",
+                intent: "Track body composition progress",
+                blockType: .habit,
+                duration: 10,
+                frequency: .timesPerWeek(2),
+                phase: .ongoing,
+                skillCategory: "Tracking"
+            ),
+            DomainActivity(
+                title: "Walk/Light Activity",
+                intent: "Increase daily movement",
+                blockType: .light,
+                duration: 30,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Movement"
+            ),
+            DomainActivity(
+                title: "Nutrition Education",
+                intent: "Learn about healthy eating",
+                blockType: .light,
+                duration: 20,
+                frequency: .timesPerWeek(2),
+                phase: .early,
+                skillCategory: "Knowledge"
+            ),
+            DomainActivity(
+                title: "Recovery & Sleep",
+                intent: "Prioritize rest for results",
+                blockType: .habit,
+                duration: 15,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Recovery"
+            )
+        ]
+
+        let milestones = [
+            DomainMilestone(title: "Habits Established", description: "Routine in place", weekRatio: 0.15),
+            DomainMilestone(title: "First Results", description: "Scale moving in right direction", weekRatio: 0.3),
+            DomainMilestone(title: "Halfway Point", description: "Significant progress visible", weekRatio: 0.5),
+            DomainMilestone(title: "Lifestyle Change", description: "New habits feel natural", weekRatio: 0.75),
+            DomainMilestone(title: "Goal Weight", description: "Target achieved", weekRatio: 1.0)
+        ]
+
+        let themes = [
+            DomainTheme(title: "Getting Started", focus: "Build foundation habits", phaseRatio: 0.0...0.15),
+            DomainTheme(title: "Building Momentum", focus: "Consistency is key", phaseRatio: 0.15...0.35),
+            DomainTheme(title: "Pushing Through", focus: "Break through plateaus", phaseRatio: 0.35...0.55),
+            DomainTheme(title: "Accelerating", focus: "Optimize your approach", phaseRatio: 0.55...0.8),
+            DomainTheme(title: "Finishing Strong", focus: "Reach your goal", phaseRatio: 0.8...1.0)
+        ]
+
+        return DomainPlan(
+            activities: activities,
+            keyMilestones: milestones,
+            weeklyThemes: themes,
+            baseBlocksPerWeek: calculateBaseBlocks(parsedGoal),
+            energyDistribution: .morningHeavy,
+            restDays: [.sunday],
+            specialConsiderations: ["Calories matter most", "Rest is essential", "Consistency beats perfection"]
+        )
+    }
+
+    // MARK: - Health/Wellness Plan
+
+    private func generateHealthPlan(_ parsedGoal: ParsedGoalAnalysis) -> DomainPlan {
+        let activities: [DomainActivity] = [
+            DomainActivity(
+                title: "Movement Practice",
+                intent: "Daily physical activity",
+                blockType: .focus,
+                duration: 30,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Movement"
+            ),
+            DomainActivity(
+                title: "Healthy Cooking",
+                intent: "Prepare nutritious meals",
+                blockType: .habit,
+                duration: 45,
+                frequency: .timesPerWeek(4),
+                phase: .ongoing,
+                skillCategory: "Nutrition"
+            ),
+            DomainActivity(
+                title: "Sleep Optimization",
+                intent: "Wind-down routine for better sleep",
+                blockType: .habit,
+                duration: 30,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Sleep"
+            ),
+            DomainActivity(
+                title: "Hydration Check",
+                intent: "Track and maintain water intake",
+                blockType: .habit,
+                duration: 5,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Hydration"
+            ),
+            DomainActivity(
+                title: "Stress Management",
+                intent: "Practice relaxation techniques",
+                blockType: .light,
+                duration: 20,
+                frequency: .timesPerWeek(3),
+                phase: .ongoing,
+                skillCategory: "Mental Health"
+            ),
+            DomainActivity(
+                title: "Health Education",
+                intent: "Learn about wellness practices",
+                blockType: .light,
+                duration: 20,
+                frequency: .timesPerWeek(2),
+                phase: .early,
+                skillCategory: "Knowledge"
+            ),
+            DomainActivity(
+                title: "Outdoor Time",
+                intent: "Fresh air and nature exposure",
+                blockType: .light,
+                duration: 30,
+                frequency: .timesPerWeek(4),
+                phase: .ongoing,
+                skillCategory: "Wellbeing"
+            ),
+            DomainActivity(
+                title: "Health Tracking",
+                intent: "Monitor vitals and progress",
+                blockType: .habit,
+                duration: 10,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Tracking"
+            )
+        ]
+
+        let milestones = [
+            DomainMilestone(title: "Foundation Set", description: "Basic habits in place", weekRatio: 0.15),
+            DomainMilestone(title: "Energy Improving", description: "Feeling more vital", weekRatio: 0.3),
+            DomainMilestone(title: "Routine Solid", description: "Habits feel automatic", weekRatio: 0.5),
+            DomainMilestone(title: "Health Transformed", description: "Major improvements noticed", weekRatio: 0.75),
+            DomainMilestone(title: "Optimal Health", description: "Living your best life", weekRatio: 1.0)
+        ]
+
+        let themes = [
+            DomainTheme(title: "Awareness", focus: "Understand your baseline", phaseRatio: 0.0...0.2),
+            DomainTheme(title: "Building", focus: "Establish healthy habits", phaseRatio: 0.2...0.4),
+            DomainTheme(title: "Deepening", focus: "Refine your approach", phaseRatio: 0.4...0.6),
+            DomainTheme(title: "Optimizing", focus: "Fine-tune for results", phaseRatio: 0.6...0.8),
+            DomainTheme(title: "Thriving", focus: "Maintain excellence", phaseRatio: 0.8...1.0)
+        ]
+
+        return DomainPlan(
+            activities: activities,
+            keyMilestones: milestones,
+            weeklyThemes: themes,
+            baseBlocksPerWeek: calculateBaseBlocks(parsedGoal),
+            energyDistribution: .morningHeavy,
+            restDays: [],
+            specialConsiderations: ["Small habits compound", "Sleep is foundational", "Listen to your body"]
+        )
+    }
+
+    // MARK: - Productivity Plan
+
+    private func generateProductivityPlan(_ parsedGoal: ParsedGoalAnalysis) -> DomainPlan {
+        let activities: [DomainActivity] = [
+            DomainActivity(
+                title: "Morning Planning",
+                intent: "Set daily priorities",
+                blockType: .habit,
+                duration: 15,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Planning"
+            ),
+            DomainActivity(
+                title: "Deep Work Block",
+                intent: "Focused, distraction-free work",
+                blockType: .focus,
+                duration: 90,
+                frequency: .timesPerWeek(5),
+                phase: .ongoing,
+                skillCategory: "Focus"
+            ),
+            DomainActivity(
+                title: "Weekly Review",
+                intent: "Assess progress and adjust",
+                blockType: .review,
+                duration: 45,
+                frequency: .timesPerWeek(1),
+                phase: .ongoing,
+                skillCategory: "Reflection"
+            ),
+            DomainActivity(
+                title: "Habit Stacking",
+                intent: "Build productive routines",
+                blockType: .habit,
+                duration: 20,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Habits"
+            ),
+            DomainActivity(
+                title: "Environment Optimization",
+                intent: "Organize workspace for productivity",
+                blockType: .light,
+                duration: 30,
+                frequency: .timesPerWeek(1),
+                phase: .ongoing,
+                skillCategory: "Environment"
+            ),
+            DomainActivity(
+                title: "Productivity Learning",
+                intent: "Study productivity techniques",
+                blockType: .light,
+                duration: 25,
+                frequency: .timesPerWeek(2),
+                phase: .early,
+                skillCategory: "Knowledge"
+            ),
+            DomainActivity(
+                title: "Energy Management",
+                intent: "Match tasks to energy levels",
+                blockType: .habit,
+                duration: 10,
+                frequency: .daily,
+                phase: .middle,
+                skillCategory: "Energy"
+            )
+        ]
+
+        let milestones = [
+            DomainMilestone(title: "System Designed", description: "Productivity system in place", weekRatio: 0.15),
+            DomainMilestone(title: "Habits Forming", description: "Routines taking hold", weekRatio: 0.3),
+            DomainMilestone(title: "Flow State", description: "Regular deep work achieved", weekRatio: 0.5),
+            DomainMilestone(title: "High Performance", description: "Consistently productive", weekRatio: 0.75),
+            DomainMilestone(title: "Mastery", description: "Peak productivity achieved", weekRatio: 1.0)
+        ]
+
+        let themes = [
+            DomainTheme(title: "Setup", focus: "Design your system", phaseRatio: 0.0...0.2),
+            DomainTheme(title: "Training", focus: "Build focus muscles", phaseRatio: 0.2...0.4),
+            DomainTheme(title: "Executing", focus: "Practice deep work", phaseRatio: 0.4...0.6),
+            DomainTheme(title: "Optimizing", focus: "Refine your approach", phaseRatio: 0.6...0.8),
+            DomainTheme(title: "Mastering", focus: "Sustainable high performance", phaseRatio: 0.8...1.0)
+        ]
+
+        return DomainPlan(
+            activities: activities,
+            keyMilestones: milestones,
+            weeklyThemes: themes,
+            baseBlocksPerWeek: calculateBaseBlocks(parsedGoal),
+            energyDistribution: .morningHeavy,
+            restDays: [.sunday],
+            specialConsiderations: ["Start with your most important task", "Protect deep work time", "Rest enables productivity"]
+        )
+    }
+
+    // MARK: - Relationship/Social Plan
+
+    private func generateRelationshipPlan(_ parsedGoal: ParsedGoalAnalysis) -> DomainPlan {
+        let activities: [DomainActivity] = [
+            DomainActivity(
+                title: "Social Practice",
+                intent: "Put yourself in social situations",
+                blockType: .focus,
+                duration: 60,
+                frequency: .timesPerWeek(3),
+                phase: .ongoing,
+                skillCategory: "Social"
+            ),
+            DomainActivity(
+                title: "Communication Skills",
+                intent: "Study and practice conversation",
+                blockType: .focus,
+                duration: 30,
+                frequency: .timesPerWeek(3),
+                phase: .early,
+                skillCategory: "Skills"
+            ),
+            DomainActivity(
+                title: "Reach Out",
+                intent: "Contact friends and new connections",
+                blockType: .habit,
+                duration: 15,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Outreach"
+            ),
+            DomainActivity(
+                title: "Self-Improvement",
+                intent: "Work on confidence and presence",
+                blockType: .light,
+                duration: 30,
+                frequency: .timesPerWeek(3),
+                phase: .ongoing,
+                skillCategory: "Self"
+            ),
+            DomainActivity(
+                title: "Event Attendance",
+                intent: "Attend social gatherings",
+                blockType: .focus,
+                duration: 120,
+                frequency: .timesPerWeek(2),
+                phase: .middle,
+                skillCategory: "Social"
+            ),
+            DomainActivity(
+                title: "Reflection Journal",
+                intent: "Reflect on social interactions",
+                blockType: .habit,
+                duration: 15,
+                frequency: .timesPerWeek(3),
+                phase: .ongoing,
+                skillCategory: "Reflection"
+            )
+        ]
+
+        let milestones = [
+            DomainMilestone(title: "Comfort Building", description: "Less anxiety in social situations", weekRatio: 0.15),
+            DomainMilestone(title: "Connections Made", description: "New relationships forming", weekRatio: 0.35),
+            DomainMilestone(title: "Confidence Growing", description: "Natural in conversations", weekRatio: 0.55),
+            DomainMilestone(title: "Network Expanding", description: "Strong social circle", weekRatio: 0.75),
+            DomainMilestone(title: "Social Success", description: "Thriving relationships", weekRatio: 1.0)
+        ]
+
+        let themes = [
+            DomainTheme(title: "Foundation", focus: "Build confidence", phaseRatio: 0.0...0.2),
+            DomainTheme(title: "Practice", focus: "Get comfortable", phaseRatio: 0.2...0.4),
+            DomainTheme(title: "Connection", focus: "Deepen relationships", phaseRatio: 0.4...0.6),
+            DomainTheme(title: "Expansion", focus: "Grow your network", phaseRatio: 0.6...0.8),
+            DomainTheme(title: "Thriving", focus: "Enjoy social life", phaseRatio: 0.8...1.0)
+        ]
+
+        return DomainPlan(
+            activities: activities,
+            keyMilestones: milestones,
+            weeklyThemes: themes,
+            baseBlocksPerWeek: calculateBaseBlocks(parsedGoal),
+            energyDistribution: .eveningHeavy,
+            restDays: [],
+            specialConsiderations: ["Quality over quantity", "Be genuinely curious", "Show up consistently"]
+        )
+    }
+
+    // MARK: - Mindfulness/Mental Health Plan
+
+    private func generateMindfulnessPlan(_ parsedGoal: ParsedGoalAnalysis) -> DomainPlan {
+        let activities: [DomainActivity] = [
+            DomainActivity(
+                title: "Meditation",
+                intent: "Daily mindfulness practice",
+                blockType: .focus,
+                duration: 20,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Meditation"
+            ),
+            DomainActivity(
+                title: "Journaling",
+                intent: "Process thoughts and emotions",
+                blockType: .habit,
+                duration: 15,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Reflection"
+            ),
+            DomainActivity(
+                title: "Breathing Exercises",
+                intent: "Calm the nervous system",
+                blockType: .light,
+                duration: 10,
+                frequency: .timesPerWeek(5),
+                phase: .ongoing,
+                skillCategory: "Breathing"
+            ),
+            DomainActivity(
+                title: "Gratitude Practice",
+                intent: "Cultivate positive mindset",
+                blockType: .habit,
+                duration: 10,
+                frequency: .daily,
+                phase: .ongoing,
+                skillCategory: "Gratitude"
+            ),
+            DomainActivity(
+                title: "Mindful Movement",
+                intent: "Yoga or gentle exercise",
+                blockType: .focus,
+                duration: 30,
+                frequency: .timesPerWeek(3),
+                phase: .ongoing,
+                skillCategory: "Movement"
+            ),
+            DomainActivity(
+                title: "Digital Detox",
+                intent: "Unplug and be present",
+                blockType: .light,
+                duration: 60,
+                frequency: .timesPerWeek(2),
+                phase: .ongoing,
+                skillCategory: "Presence"
+            ),
+            DomainActivity(
+                title: "Self-Care Time",
+                intent: "Activities that nurture you",
+                blockType: .light,
+                duration: 45,
+                frequency: .timesPerWeek(3),
+                phase: .ongoing,
+                skillCategory: "Self-Care"
+            ),
+            DomainActivity(
+                title: "Learning Session",
+                intent: "Study mindfulness techniques",
+                blockType: .light,
+                duration: 25,
+                frequency: .timesPerWeek(2),
+                phase: .early,
+                skillCategory: "Knowledge"
+            )
+        ]
+
+        let milestones = [
+            DomainMilestone(title: "Practice Started", description: "Daily habit established", weekRatio: 0.15),
+            DomainMilestone(title: "Awareness Growing", description: "More present moments", weekRatio: 0.3),
+            DomainMilestone(title: "Calm Increasing", description: "Stress levels dropping", weekRatio: 0.5),
+            DomainMilestone(title: "Transformation", description: "New mental patterns", weekRatio: 0.75),
+            DomainMilestone(title: "Inner Peace", description: "Sustainable calm achieved", weekRatio: 1.0)
+        ]
+
+        let themes = [
+            DomainTheme(title: "Beginning", focus: "Start your practice", phaseRatio: 0.0...0.2),
+            DomainTheme(title: "Developing", focus: "Build consistency", phaseRatio: 0.2...0.4),
+            DomainTheme(title: "Deepening", focus: "Go deeper", phaseRatio: 0.4...0.6),
+            DomainTheme(title: "Integrating", focus: "Apply to daily life", phaseRatio: 0.6...0.8),
+            DomainTheme(title: "Embodying", focus: "Living mindfully", phaseRatio: 0.8...1.0)
+        ]
+
+        return DomainPlan(
+            activities: activities,
+            keyMilestones: milestones,
+            weeklyThemes: themes,
+            baseBlocksPerWeek: calculateBaseBlocks(parsedGoal),
+            energyDistribution: .morningHeavy,
+            restDays: [],
+            specialConsiderations: ["Start small", "Consistency matters more than duration", "Be gentle with yourself"]
+        )
+    }
+
     // MARK: - Helper Methods
 
     private func calculateBaseBlocks(_ parsedGoal: ParsedGoalAnalysis) -> Int {
@@ -1800,6 +2412,12 @@ enum GoalDomain {
     case creative
     case language
     case career
+    case income         // Making money, side hustles, income goals
+    case weightLoss     // Weight loss, body transformation
+    case health         // General health, wellness, longevity
+    case productivity   // Time management, habits, efficiency
+    case relationship   // Social skills, dating, networking
+    case mindfulness    // Mental health, meditation, stress
     case general
 }
 
