@@ -12,6 +12,9 @@ final class DataService: ObservableObject {
     @Published private(set) var currentUser: User?
     @Published private(set) var activeGoal: IdentityGoal?
 
+    /// Reference to achievement service for delegating achievement operations
+    private let achievementService = AchievementService.shared
+
     private init() {
         do {
             let schema = Schema([
@@ -33,6 +36,9 @@ final class DataService: ObservableObject {
 
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
             modelContext = modelContainer.mainContext
+
+            // Configure achievement service with model context
+            achievementService.configure(with: modelContext)
 
             loadCurrentUser()
         } catch {
@@ -373,168 +379,33 @@ final class DataService: ObservableObject {
         saveContext()
     }
 
-    // MARK: - Achievement Management
+    // MARK: - Achievement Management (Delegated to AchievementService)
 
+    /// Initialize achievements for a user - delegates to AchievementService
     func initializeAchievements(for user: User) {
-        guard user.achievements.isEmpty else { return }
-
-        for type in AchievementType.allCases {
-            let achievement = Achievement(achievementType: type)
-            achievement.user = user
-            user.achievements.append(achievement)
-            modelContext.insert(achievement)
-        }
-        saveContext()
+        achievementService.initializeAchievements(for: user)
     }
 
+    /// Check and unlock achievements - delegates to AchievementService
     func checkAndUnlockAchievements(for user: User) {
         guard let goal = user.activeGoal else { return }
-
-        var unlockedNew = false
-
-        for achievement in user.achievements where !achievement.isUnlocked {
-            let shouldUnlock = checkAchievementCondition(achievement, user: user, goal: goal)
-            if shouldUnlock {
-                achievement.unlock()
-                unlockedNew = true
-            }
-        }
-
-        if unlockedNew {
-            saveContext()
-        }
+        let context = AchievementContextBuilder.build(user: user, goal: goal)
+        achievementService.checkAchievements(for: user, context: context)
     }
 
-    private func checkAchievementCondition(_ achievement: Achievement, user: User, goal: IdentityGoal) -> Bool {
-        let type = achievement.achievementType
-
-        switch type {
-        // Streak achievements
-        case .firstStep:
-            return goal.totalBlocksCompleted >= 1
-        case .weekWarrior:
-            return goal.currentStreak >= 7
-        case .twoWeekTitan:
-            return goal.currentStreak >= 14
-        case .monthlyMaster:
-            return goal.currentStreak >= 30
-        case .quarterChampion:
-            return goal.currentStreak >= 90
-
-        // Completion achievements
-        case .tenBlocks:
-            return user.totalBlocksEverCompleted >= 10
-        case .fiftyBlocks:
-            return user.totalBlocksEverCompleted >= 50
-        case .hundredBlocks:
-            return user.totalBlocksEverCompleted >= 100
-        case .fiveHundredBlocks:
-            return user.totalBlocksEverCompleted >= 500
-
-        // Time-based achievements
-        case .earlyBird:
-            let earlyBlocks = countEarlyMorningBlocks(for: goal)
-            achievement.progress = earlyBlocks
-            return earlyBlocks >= 5
-        case .nightOwl:
-            let nightBlocks = countNightBlocks(for: goal)
-            achievement.progress = nightBlocks
-            return nightBlocks >= 5
-        case .weekendWarrior:
-            let weekendCount = countWeekendEngagements(for: user)
-            achievement.progress = weekendCount
-            return weekendCount >= 4
-
-        // Milestone achievements
-        case .firstMilestone:
-            return goal.milestones.contains { $0.isCompleted }
-        case .halfwayHero:
-            return calculateProgress(for: goal) >= 0.5
-        case .goalGetter:
-            return user.totalGoalsCompleted >= 1
-
-        // Engagement achievements
-        case .reflector:
-            let reflectionCount = goal.reflections.count
-            achievement.progress = reflectionCount
-            return reflectionCount >= 4
-        case .adapter:
-            let adaptCount = countAdaptations(for: goal)
-            achievement.progress = adaptCount
-            return adaptCount >= 10
-        case .perfectWeek:
-            return hasPerfectWeek(for: goal)
-
-        // Special achievements
-        case .newYearNewYou:
-            let calendar = Calendar.current
-            let isJanFirst = calendar.component(.month, from: Date()) == 1 &&
-                             calendar.component(.day, from: Date()) == 1
-            return isJanFirst && goal.totalBlocksCompleted > 0
-        case .comebackKid:
-            return checkComebackKid(for: user)
-        }
-    }
-
-    private func countEarlyMorningBlocks(for goal: IdentityGoal) -> Int {
-        goal.planBlocks.filter { block in
-            block.status == .completed &&
-            Calendar.current.component(.hour, from: block.startDateTime) < 8
-        }.count
-    }
-
-    private func countNightBlocks(for goal: IdentityGoal) -> Int {
-        goal.planBlocks.filter { block in
-            block.status == .completed &&
-            Calendar.current.component(.hour, from: block.startDateTime) >= 20
-        }.count
-    }
-
-    private func countWeekendEngagements(for user: User) -> Int {
-        let weekendEngagements = user.dailyEngagements.filter { engagement in
-            engagement.isWeekend && engagement.blocksCompleted > 0
-        }
-        // Count unique weekends
-        var weekends = Set<String>()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-ww"
-        for engagement in weekendEngagements {
-            weekends.insert(formatter.string(from: engagement.date))
-        }
-        return weekends.count
-    }
-
-    private func countAdaptations(for goal: IdentityGoal) -> Int {
-        goal.planBlocks.filter { $0.wasMoved || $0.wasReduced }.count
-    }
-
-    private func hasPerfectWeek(for goal: IdentityGoal) -> Bool {
-        let calendar = Calendar.current
-        guard let weekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())),
-              let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart) else {
-            return false
-        }
-
-        let weekBlocks = goal.planBlocks.filter { block in
-            block.startDateTime >= weekStart && block.startDateTime < weekEnd
-        }
-
-        guard !weekBlocks.isEmpty else { return false }
-        return weekBlocks.allSatisfy { $0.status == .completed }
-    }
-
-    private func checkComebackKid(for user: User) -> Bool {
-        guard let lastEngagement = user.lastEngagementDate else { return false }
-        let daysSinceEngagement = Calendar.current.dateComponents(
-            [.day],
-            from: lastEngagement,
-            to: Date()
-        ).day ?? 0
-        return daysSinceEngagement >= 7
-    }
-
+    /// Get a specific achievement by type - delegates to AchievementService
     func getAchievement(type: AchievementType, for user: User) -> Achievement? {
-        user.achievements.first { $0.achievementType == type }
+        achievementService.getAchievement(type: type, for: user)
+    }
+
+    /// Get achievement snapshots for a user
+    func getAchievementSnapshots(for user: User) -> [AchievementSnapshot] {
+        achievementService.getAchievementSnapshots(for: user)
+    }
+
+    /// Get achievements grouped by category
+    func getAchievementsByCategory(for user: User) -> [AchievementCategory: [AchievementSnapshot]] {
+        achievementService.getAchievementsByCategory(for: user)
     }
 
     // MARK: - Block Template Management
