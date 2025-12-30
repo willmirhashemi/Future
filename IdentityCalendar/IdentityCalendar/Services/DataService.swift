@@ -26,7 +26,8 @@ final class DataService: ObservableObject {
                 WeeklyReflection.self,
                 Achievement.self,
                 BlockTemplate.self,
-                DailyEngagement.self
+                DailyEngagement.self,
+                Task.self
             ])
 
             let modelConfiguration = ModelConfiguration(
@@ -406,6 +407,76 @@ final class DataService: ObservableObject {
     /// Get achievements grouped by category
     func getAchievementsByCategory(for user: User) -> [AchievementCategory: [AchievementSnapshot]] {
         achievementService.getAchievementsByCategory(for: user)
+    }
+
+    // MARK: - Task Management
+
+    func createTask(
+        title: String,
+        notes: String? = nil,
+        category: TaskCategory = .other,
+        priority: TaskPriority = .medium,
+        dueDate: Date = Date(),
+        reminderTime: Date? = nil
+    ) -> Task {
+        let user = getOrCreateUser()
+
+        let task = Task(
+            title: title,
+            notes: notes,
+            category: category,
+            priority: priority,
+            dueDate: dueDate,
+            reminderTime: reminderTime
+        )
+
+        task.user = user
+        user.tasks.append(task)
+        modelContext.insert(task)
+        saveContext()
+
+        return task
+    }
+
+    func updateTask(_ task: Task) {
+        saveContext()
+    }
+
+    func deleteTask(_ task: Task) {
+        modelContext.delete(task)
+        saveContext()
+    }
+
+    func toggleTaskComplete(_ task: Task) {
+        task.toggleComplete()
+        saveContext()
+    }
+
+    func tasksForDate(_ date: Date) -> [Task] {
+        guard let user = currentUser else { return [] }
+        let calendar = Calendar.current
+        return user.tasks.filter { task in
+            calendar.isDate(task.dueDate, inSameDayAs: date)
+        }.sorted { first, second in
+            if first.isCompleted != second.isCompleted {
+                return !first.isCompleted
+            }
+            return first.priority.rawValue > second.priority.rawValue
+        }
+    }
+
+    func incompleteTasks() -> [Task] {
+        guard let user = currentUser else { return [] }
+        return user.tasks
+            .filter { !$0.isCompleted }
+            .sorted { $0.dueDate < $1.dueDate }
+    }
+
+    func overdueTasks() -> [Task] {
+        guard let user = currentUser else { return [] }
+        return user.tasks
+            .filter { $0.isOverdue }
+            .sorted { $0.dueDate < $1.dueDate }
     }
 
     // MARK: - Block Template Management

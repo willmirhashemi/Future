@@ -35,6 +35,9 @@ final class User {
     @Relationship(deleteRule: .cascade)
     var dailyEngagements: [DailyEngagement]
 
+    @Relationship(deleteRule: .cascade)
+    var tasks: [Task]
+
     var activeGoal: IdentityGoal? {
         goals.first { $0.status == .active }
     }
@@ -76,7 +79,8 @@ final class User {
         goals: [IdentityGoal] = [],
         achievements: [Achievement] = [],
         blockTemplates: [BlockTemplate] = [],
-        dailyEngagements: [DailyEngagement] = []
+        dailyEngagements: [DailyEngagement] = [],
+        tasks: [Task] = []
     ) {
         self.id = id
         self.createdAt = createdAt
@@ -95,6 +99,7 @@ final class User {
         self.achievements = achievements
         self.blockTemplates = blockTemplates
         self.dailyEngagements = dailyEngagements
+        self.tasks = tasks
     }
 }
 

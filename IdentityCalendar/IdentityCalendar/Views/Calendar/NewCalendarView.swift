@@ -7,6 +7,8 @@ struct NewCalendarView: View {
     @State private var showBlockDetail = false
     @State private var selectedBlock: PlanBlock?
     @State private var showAddBlock = false
+    @State private var showDayDetail = false
+    @State private var selectedDayDate: Date = Date()
     @State private var appearAnimation = false
 
     var body: some View {
@@ -39,6 +41,11 @@ struct NewCalendarView: View {
                                     viewModel.selectedDate = date
                                 }
                                 viewModel.loadBlocks()
+                            },
+                            onDateDoubleTap: { date in
+                                Haptics.tap()
+                                selectedDayDate = date
+                                showDayDetail = true
                             }
                         )
                         .opacity(appearAnimation ? 1 : 0)
@@ -53,6 +60,10 @@ struct NewCalendarView: View {
                                 showBlockDetail = true
                             },
                             onAddBlock: { showAddBlock = true },
+                            onViewDetails: {
+                                selectedDayDate = viewModel.selectedDate
+                                showDayDetail = true
+                            },
                             colorScheme: colorScheme
                         )
                         .opacity(appearAnimation ? 1 : 0)
@@ -129,6 +140,12 @@ struct NewCalendarView: View {
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
+        .fullScreenCover(isPresented: $showDayDetail) {
+            DayDetailView(date: selectedDayDate)
+                .onDisappear {
+                    viewModel.refresh()
+                }
+        }
         .onAppear {
             viewModel.refresh()
             withAnimation(.easeOut(duration: 0.5).delay(0.1)) {
@@ -198,6 +215,7 @@ struct MonthGridView: View {
     let blocks: [PlanBlock]
     let colorScheme: ColorScheme
     let onDateSelected: (Date) -> Void
+    var onDateDoubleTap: ((Date) -> Void)? = nil
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
     private let weekdays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
@@ -226,6 +244,9 @@ struct MonthGridView: View {
                             colorScheme: colorScheme,
                             onTap: {
                                 onDateSelected(date)
+                            },
+                            onDoubleTap: {
+                                onDateDoubleTap?(date)
                             }
                         )
                     } else {
@@ -281,6 +302,7 @@ struct DayCell: View {
     let blocksCount: Int
     let colorScheme: ColorScheme
     let onTap: () -> Void
+    var onDoubleTap: (() -> Void)? = nil
 
     var body: some View {
         Button(action: onTap) {
@@ -320,6 +342,12 @@ struct DayCell: View {
             )
         }
         .buttonStyle(ScaleButtonStyle())
+        .simultaneousGesture(
+            TapGesture(count: 2)
+                .onEnded { _ in
+                    onDoubleTap?()
+                }
+        )
     }
 
     private var textColor: Color {
@@ -360,6 +388,7 @@ struct SelectedDayScheduleView: View {
     let blocks: [PlanBlock]
     let onBlockTap: (PlanBlock) -> Void
     let onAddBlock: () -> Void
+    var onViewDetails: (() -> Void)? = nil
     let colorScheme: ColorScheme
 
     var body: some View {
@@ -391,6 +420,15 @@ struct SelectedDayScheduleView: View {
                     .padding(.vertical, 6)
                     .background(AppTheme.accent.opacity(0.12))
                     .clipShape(Capsule())
+                }
+
+                // View details button
+                if let onViewDetails = onViewDetails {
+                    Button(action: onViewDetails) {
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.system(size: 18))
+                            .foregroundColor(AppTheme.accent)
+                    }
                 }
             }
 

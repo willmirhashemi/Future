@@ -24,6 +24,8 @@
 		A10000000000000000000066 /* AchievementDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000066 /* AchievementDetailView.swift */; };
 		A10000000000000000000067 /* AchievementsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000067 /* AchievementsListView.swift */; };
 		A10000000000000000000068 /* AchievementUnlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000068 /* AchievementUnlockView.swift */; };
+		A10000000000000000000070 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000070 /* Task.swift */; };
+		A10000000000000000000071 /* DayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000071 /* DayDetailView.swift */; };
 		A10000000000000000000009 /* AIPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* AIPlannerService.swift */; };
 		A10000000000000000000010 /* MockAIPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000010 /* MockAIPlannerService.swift */; };
 		A10000000000000000000050 /* AdvancedAIPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000051 /* AdvancedAIPlannerService.swift */; };
@@ -130,6 +132,8 @@
 		A20000000000000000000066 /* AchievementDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementDetailView.swift; sourceTree = "<group>"; };
 		A20000000000000000000067 /* AchievementsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsListView.swift; sourceTree = "<group>"; };
 		A20000000000000000000068 /* AchievementUnlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementUnlockView.swift; sourceTree = "<group>"; };
+		A20000000000000000000070 /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		A20000000000000000000071 /* DayDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -241,6 +245,7 @@
 				A20000000000000000000006 /* PlanBlock.swift */,
 				A20000000000000000000007 /* WeeklyReflection.swift */,
 				A20000000000000000000008 /* Subscription.swift */,
+				A20000000000000000000070 /* Task.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -350,6 +355,7 @@
 				A20000000000000000000038 /* BlockView.swift */,
 				A20000000000000000000039 /* BlockDetailSheet.swift */,
 				A20000000000000000000048 /* NewCalendarView.swift */,
+				A20000000000000000000071 /* DayDetailView.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -513,6 +519,8 @@
 				A10000000000000000000066 /* AchievementDetailView.swift in Sources */,
 				A10000000000000000000067 /* AchievementsListView.swift in Sources */,
 				A10000000000000000000068 /* AchievementUnlockView.swift in Sources */,
+				A10000000000000000000070 /* Task.swift in Sources */,
+				A10000000000000000000071 /* DayDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
