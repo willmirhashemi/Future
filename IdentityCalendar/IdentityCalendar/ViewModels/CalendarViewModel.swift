@@ -15,10 +15,21 @@ final class CalendarViewModel: ObservableObject {
     @Published var currentWeekTheme: WeeklyTheme?
     @Published var isLoading = false
 
+    // AI-related state
+    @Published var showAIInput = false
+    @Published var aiInputText = ""
+    @Published var suggestedSlots: [TimeSlot] = []
+    @Published var dailyInsight: String?
+    @Published var dayAnalysis: DayAnalysis?
+
     // MARK: - Dependencies
 
     private let dataService: DataService
     private let subscriptionService: SubscriptionService
+    private let smartScheduler = SmartScheduler.shared
+    private let nlParser = NaturalLanguageBlockParser.shared
+    private let patternAnalyzer = UserPatternAnalyzer.shared
+    private let aiService = AIIntegrationService.shared
 
     // MARK: - Computed Properties
 
@@ -267,6 +278,139 @@ final class CalendarViewModel: ObservableObject {
         let blockHeight = max(Constants.Calendar.blockMinHeight, (durationMinutes / 60) * hourHeight)
 
         return (top, blockHeight)
+    }
+
+    // MARK: - AI Features
+
+    /// Parse natural language and create a block
+    func createBlockFromNaturalLanguage(_ input: String) {
+        guard !input.isEmpty else { return }
+
+        Haptics.tap()
+        isLoading = true
+
+        // Parse the input locally
+        if let parsed = nlParser.parse(input) {
+            let block = parsed.toPlanBlock(weekNumber: weekNumber)
+
+            // Check for conflicts
+            let conflicts = smartScheduler.detectConflicts(
+                proposedStart: block.startDateTime,
+                proposedEnd: block.endDateTime,
+                existingBlocks: blocksForDisplay
+            )
+
+            if conflicts.isEmpty {
+                addBlock(block)
+                aiInputText = ""
+                showAIInput = false
+            } else {
+                // Find alternative slot
+                findOptimalSlots(for: block)
+            }
+        }
+
+        isLoading = false
+    }
+
+    /// Find optimal time slots for a block
+    func findOptimalSlots(for block: PlanBlock? = nil) {
+        let userPatterns = patternAnalyzer.getCachedPatterns()
+
+        if let block = block {
+            suggestedSlots = smartScheduler.findOptimalSlots(
+                for: block.durationMinutes,
+                blockType: block.blockType,
+                energyLevel: block.energyLevel,
+                existingBlocks: blocksForDisplay,
+                userPatterns: userPatterns,
+                preferredDate: selectedDate
+            )
+        } else {
+            // Default: find slots for a 45-min focus block
+            suggestedSlots = smartScheduler.findOptimalSlots(
+                for: 45,
+                blockType: .focus,
+                energyLevel: .medium,
+                existingBlocks: blocksForDisplay,
+                userPatterns: userPatterns,
+                preferredDate: selectedDate
+            )
+        }
+    }
+
+    /// Get smart reschedule suggestion for a block
+    func getSmartReschedule(for block: PlanBlock) -> TimeSlot? {
+        let userPatterns = patternAnalyzer.getCachedPatterns()
+        return smartScheduler.findBestReschedule(
+            for: block,
+            existingBlocks: blocksForDisplay,
+            userPatterns: userPatterns
+        )
+    }
+
+    /// Analyze the selected day
+    func analyzeSelectedDay() {
+        dayAnalysis = smartScheduler.analyzeDay(date: selectedDate, blocks: blocksForDisplay)
+    }
+
+    /// Load daily AI insight
+    func loadDailyInsight() {
+        guard let goal = activeGoal else { return }
+
+        let completionRate = Double(todayCompletedCount) / Double(max(1, todayBlocksCount))
+        let insights = patternAnalyzer.getDetailedInsights(from: blocksForDisplay)
+
+        Task {
+            dailyInsight = await aiService.generateDailyInsight(
+                completionRate: completionRate,
+                streak: insights.streakData.currentStreak,
+                goal: goal
+            )
+        }
+    }
+
+    /// Get user behavior patterns
+    func getUserPatterns() -> UserPatterns {
+        patternAnalyzer.analyzePatterns(from: blocksForDisplay)
+    }
+
+    /// Get behavior insights
+    func getBehaviorInsights() -> BehaviorInsights {
+        patternAnalyzer.getDetailedInsights(from: blocksForDisplay)
+    }
+
+    /// Get recommendations based on patterns
+    func getRecommendations() -> [PatternRecommendation] {
+        let insights = getBehaviorInsights()
+        return patternAnalyzer.generateRecommendations(from: insights)
+    }
+
+    /// Toggle AI input visibility
+    func toggleAIInput() {
+        Haptics.tap()
+        withAnimation(Constants.Animation.standard) {
+            showAIInput.toggle()
+            if showAIInput {
+                findOptimalSlots()
+            }
+        }
+    }
+
+    /// Apply suggested time slot to create a block
+    func applySlot(_ slot: TimeSlot, title: String, blockType: BlockType) {
+        let block = PlanBlock(
+            startDateTime: slot.startTime,
+            endDateTime: slot.endTime,
+            title: title,
+            intentShort: "Scheduled activity",
+            blockType: blockType,
+            weekNumber: weekNumber
+        )
+        addBlock(block)
+        showAIInput = false
+        aiInputText = ""
+        suggestedSlots = []
     }
 }
 
