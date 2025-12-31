@@ -297,31 +297,3 @@ struct AchievementDetailSheet: View {
         }
     }
 }
-
-
-// MARK: - Preview
-
-#Preview {
-    VStack(spacing: 24) {
-        AchievementBadgeView(
-            achievement: Achievement(
-                achievementType: .weekWarrior,
-                isUnlocked: true,
-                progress: 7
-            ),
-            size: .large
-        )
-
-        AchievementBadgeView(
-            achievement: Achievement(
-                achievementType: .monthlyMaster,
-                isUnlocked: false,
-                progress: 15
-            ),
-            size: .large
-        )
-    }
-    .padding()
-    .background(Color.black)
-    .themed()
-}

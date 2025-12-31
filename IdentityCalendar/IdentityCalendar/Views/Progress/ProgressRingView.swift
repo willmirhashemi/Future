@@ -199,28 +199,3 @@ struct HeroProgressRing: View {
         }
     }
 }
-
-// MARK: - Preview
-
-#Preview {
-    VStack(spacing: 32) {
-        HeroProgressRing(
-            streakInfo: StreakInfo(
-                currentStreak: 12,
-                longestStreak: 21,
-                lastActiveDate: Date(),
-                streakStartDate: Calendar.current.date(byAdding: .day, value: -12, to: Date()),
-                isActiveToday: true
-            )
-        )
-
-        ProgressRingsRow(rings: [
-            ProgressRingData.daily(completed: 3, scheduled: 5),
-            ProgressRingData.weekly(completed: 12, scheduled: 20),
-            ProgressRingData.streak(current: 12)
-        ])
-    }
-    .padding()
-    .background(Color.black)
-    .themed()
-}

@@ -474,15 +474,3 @@ struct WeekdayPicker: View {
         }
     }
 }
-
-// MARK: - Preview
-
-#Preview {
-    TemplatePickerView(
-        dataService: DataService.shared,
-        selectedDate: Date(),
-        onTemplateSelected: { _ in },
-        onDismiss: {}
-    )
-    .themed()
-}
