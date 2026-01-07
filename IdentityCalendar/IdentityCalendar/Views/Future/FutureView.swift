@@ -5,8 +5,6 @@ struct FutureView: View {
     @StateObject private var progressViewModel = ProgressViewModel()
     @ObservedObject private var dataService = DataService.shared
     @Environment(\.appColorScheme) private var colorScheme
-    @ObservedObject private var subscriptionService = SubscriptionService.shared
-    @State private var showPaywall = false
     @State private var showSettings = false
     @State private var showAllAchievements = false
     @State private var selectedSection: FutureSection = .overview
@@ -47,11 +45,6 @@ struct FutureView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
                 .padding(.bottom, 100)
-            }
-        }
-        .sheet(isPresented: $showPaywall) {
-            PaywallView(source: .featureGate) {
-                showPaywall = false
             }
         }
         .sheet(isPresented: $showSettings) {
@@ -142,18 +135,11 @@ struct FutureView: View {
                 )
             }
 
-            // Pro features or Insights
-            if !subscriptionService.isPremium {
-                ProFeaturesCard(
-                    colorScheme: colorScheme,
-                    onUpgrade: { showPaywall = true }
-                )
-            } else {
-                InsightsCardView(
-                    weeklyStats: progressViewModel.weeklyStats,
-                    colorScheme: colorScheme
-                )
-            }
+            // Insights - now available to all users
+            InsightsCardView(
+                weeklyStats: progressViewModel.weeklyStats,
+                colorScheme: colorScheme
+            )
 
             // Weekly reflection prompt
             if shouldShowReflection {
@@ -216,24 +202,18 @@ struct FutureView: View {
                     colorScheme: colorScheme
                 )
 
-                // Insights (Pro)
-                if subscriptionService.isPremium {
-                    InsightsCardView(
-                        weeklyStats: progressViewModel.weeklyStats,
-                        colorScheme: colorScheme
-                    )
-                } else {
-                    LockedAnalyticsCard(
-                        colorScheme: colorScheme,
-                        onUpgrade: { showPaywall = true }
-                    )
-                }
+                // Insights - now available to all users
+                InsightsCardView(
+                    weeklyStats: progressViewModel.weeklyStats,
+                    colorScheme: colorScheme
+                )
             }
         }
     }
 
     private var shouldShowReflection: Bool {
-        Date().isSunday && subscriptionService.isPremium
+        // Reflection available to all users on Sundays
+        Date().isSunday
     }
 
     private func initializeAchievementsIfNeeded() {
@@ -549,43 +529,6 @@ struct WeeklyComparisonChart: View {
     }
 }
 
-// MARK: - Locked Analytics Card
-
-struct LockedAnalyticsCard: View {
-    let colorScheme: ColorScheme
-    let onUpgrade: () -> Void
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "lock.fill")
-                .font(.system(size: 28))
-                .foregroundColor(AppTheme.tertiaryText(colorScheme))
-
-            Text("Unlock Deep Analytics")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(AppTheme.primaryText(colorScheme))
-
-            Text("Get insights into your productivity patterns, best times to work, and AI recommendations")
-                .font(.system(size: 14, weight: .regular))
-                .foregroundColor(AppTheme.secondaryText(colorScheme))
-                .multilineTextAlignment(.center)
-
-            Button(action: onUpgrade) {
-                Text("Upgrade to Pro")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 44)
-                    .background(AppTheme.accent)
-                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-            }
-        }
-        .padding(24)
-        .background(AppTheme.cardBackground(colorScheme))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
-}
-
 // MARK: - All Achievements View
 
 struct AllAchievementsView: View {
@@ -796,72 +739,6 @@ struct MilestoneItemRow: View {
                     .foregroundColor(AppTheme.tertiaryText(colorScheme))
             }
             .padding(.bottom, isLast ? 0 : 16)
-
-            Spacer()
-        }
-    }
-}
-
-struct ProFeaturesCard: View {
-    let colorScheme: ColorScheme
-    let onUpgrade: () -> Void
-
-    var body: some View {
-        VStack(spacing: 16) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Unlock Your Full Potential")
-                        .font(.headline)
-                        .foregroundColor(.white)
-
-                    Text("Get AI-powered insights and adaptive planning")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.8))
-                }
-
-                Spacer()
-
-                Image(systemName: "sparkles")
-                    .font(.system(size: 32))
-                    .foregroundColor(.white.opacity(0.8))
-            }
-
-            VStack(spacing: 8) {
-                ProFeatureRow(icon: "brain.head.profile", text: "Weekly AI adaptation")
-                ProFeatureRow(icon: "chart.line.uptrend.xyaxis", text: "Progress insights")
-                ProFeatureRow(icon: "arrow.triangle.2.circlepath", text: "Smart rescheduling")
-            }
-
-            Button(action: onUpgrade) {
-                Text("Upgrade to Pro")
-                    .font(.headline)
-                    .foregroundColor(AppTheme.accent)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 48)
-                    .background(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            }
-        }
-        .padding(20)
-        .background(AppTheme.premiumGradient)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-    }
-}
-
-struct ProFeatureRow: View {
-    let icon: String
-    let text: String
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Image(systemName: icon)
-                .font(.caption)
-                .foregroundColor(.white.opacity(0.9))
-                .frame(width: 20)
-
-            Text(text)
-                .font(.subheadline)
-                .foregroundColor(.white.opacity(0.9))
 
             Spacer()
         }

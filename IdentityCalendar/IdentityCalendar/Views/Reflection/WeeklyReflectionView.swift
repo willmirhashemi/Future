@@ -291,7 +291,7 @@ struct ProcessingView: View {
                     .font(.title3.weight(.semibold))
                     .foregroundColor(.appPrimaryText)
 
-                Text("This just takes a moment")
+                Text("AI is adapting your upcoming week")
                     .font(.body)
                     .foregroundColor(.appSecondaryText)
             }
@@ -336,13 +336,18 @@ struct CompleteView: View {
                         .foregroundColor(.appSecondaryText)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
+                } else {
+                    Text("Your plan has been updated based on your feedback")
+                        .font(.body)
+                        .foregroundColor(.appSecondaryText)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
                 }
             }
 
-            if viewModel.showPremiumPrompt {
-                PremiumPromptCard()
-                    .padding(.top, 16)
-            }
+            // AI adaptation confirmation
+            AIAdaptationConfirmation()
+                .padding(.top, 16)
 
             Spacer()
 
@@ -353,19 +358,19 @@ struct CompleteView: View {
     }
 }
 
-/// Premium prompt for free users
-struct PremiumPromptCard: View {
+/// AI adaptation confirmation card - shows users that AI has adjusted their plan
+struct AIAdaptationConfirmation: View {
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: "sparkles")
                 .font(.system(size: 24))
                 .foregroundColor(.appAccent)
 
-            Text("Unlock AI adaptation")
+            Text("AI Plan Adjusted")
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.appPrimaryText)
 
-            Text("Pro users get their plan automatically adjusted each week")
+            Text("Your upcoming week has been optimized based on your reflection")
                 .font(.caption)
                 .foregroundColor(.appSecondaryText)
                 .multilineTextAlignment(.center)
