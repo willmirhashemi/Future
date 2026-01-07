@@ -13,13 +13,11 @@ final class ReflectionViewModel: ObservableObject {
     @Published var isProcessing = false
     @Published var adaptationSummary: String?
     @Published var isComplete = false
-    @Published var showPremiumPrompt = false
 
     // MARK: - Dependencies
 
     private let dataService: DataService
     private let aiPlanner: AIPlannerService
-    private let subscriptionService: SubscriptionService
 
     // MARK: - Week Info
 
@@ -60,12 +58,10 @@ final class ReflectionViewModel: ObservableObject {
 
     init(
         dataService: DataService = .shared,
-        aiPlanner: AIPlannerService? = nil,
-        subscriptionService: SubscriptionService = .shared
+        aiPlanner: AIPlannerService? = nil
     ) {
         self.dataService = dataService
         self.aiPlanner = aiPlanner ?? MockAIPlannerService()
-        self.subscriptionService = subscriptionService
 
         setupWeekInfo()
     }
@@ -166,44 +162,38 @@ final class ReflectionViewModel: ObservableObject {
                 note: note.isEmpty ? nil : note
             )
 
-            // Check if user has premium for AI adaptation
-            if subscriptionService.isPremium {
-                do {
-                    // Get current blocks for the next week
-                    let nextWeekStart = weekEnd.adding(days: 1)
-                    let nextWeekEnd = nextWeekStart.adding(days: 6)
-                    let currentBlocks = dataService.blocksForDateRange(
-                        start: nextWeekStart,
-                        end: nextWeekEnd,
-                        goal: goal
-                    )
+            // All users get AI adaptation (no paywall)
+            do {
+                // Get current blocks for the next week
+                let nextWeekStart = weekEnd.adding(days: 1)
+                let nextWeekEnd = nextWeekStart.adding(days: 6)
+                let currentBlocks = dataService.blocksForDateRange(
+                    start: nextWeekStart,
+                    end: nextWeekEnd,
+                    goal: goal
+                )
 
-                    // Call AI for adaptation
-                    let response = try await aiPlanner.adaptWeeklyPlan(
-                        for: goal,
-                        reflection: reflection,
-                        currentBlocks: currentBlocks
-                    )
+                // Call AI for adaptation
+                let response = try await aiPlanner.adaptWeeklyPlan(
+                    for: goal,
+                    reflection: reflection,
+                    currentBlocks: currentBlocks
+                )
 
-                    // Apply new blocks
-                    let newBlocks = response.updatedBlocks.compactMap { $0.toPlanBlock() }
-                    dataService.addBlocks(newBlocks, to: goal)
+                // Apply new blocks
+                let newBlocks = response.updatedBlocks.compactMap { $0.toPlanBlock() }
+                dataService.addBlocks(newBlocks, to: goal)
 
-                    // Update reflection with AI summary
-                    reflection.aiAdjustmentSummary = response.summary
-                    reflection.wasProcessed = true
-                    dataService.saveContext()
+                // Update reflection with AI summary
+                reflection.aiAdjustmentSummary = response.summary
+                reflection.wasProcessed = true
+                dataService.saveContext()
 
-                    adaptationSummary = response.summary
+                adaptationSummary = response.summary
 
-                } catch {
-                    // Fallback summary on error
-                    adaptationSummary = "Your reflection has been saved. We'll adjust your plan based on your feedback."
-                }
-            } else {
-                // Free user - show prompt to upgrade
-                adaptationSummary = "Your reflection has been saved."
-                showPremiumPrompt = true
+            } catch {
+                // Fallback summary on error
+                adaptationSummary = "Your reflection has been saved. We'll adjust your plan based on your feedback."
             }
 
             isProcessing = false
@@ -227,7 +217,6 @@ final class ReflectionViewModel: ObservableObject {
         isProcessing = false
         adaptationSummary = nil
         isComplete = false
-        showPremiumPrompt = false
     }
 }
 

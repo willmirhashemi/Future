@@ -5,7 +5,6 @@ import SwiftData
 @main
 struct IdentityCalendarApp: App {
     @StateObject private var dataService = DataService.shared
-    @StateObject private var subscriptionService = SubscriptionService.shared
     @StateObject private var notificationService = NotificationService.shared
     @StateObject private var themeManager = ThemeManager.shared
 
@@ -13,7 +12,6 @@ struct IdentityCalendarApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(dataService)
-                .environmentObject(subscriptionService)
                 .environmentObject(notificationService)
                 .environmentObject(themeManager)
                 .modelContainer(dataService.modelContainer)
@@ -211,7 +209,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 #Preview {
     RootView()
         .environmentObject(DataService.shared)
-        .environmentObject(SubscriptionService.shared)
         .environmentObject(NotificationService.shared)
         .environmentObject(ThemeManager.shared)
         .themed()

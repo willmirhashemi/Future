@@ -42,15 +42,9 @@ struct OnboardingContainerView: View {
                 .animation(.easeInOut(duration: 0.3), value: viewModel.currentStep)
             }
         }
-        .sheet(isPresented: $viewModel.showPaywall) {
-            PaywallView(source: .onboarding) {
-                viewModel.dismissPaywall()
-                onComplete?()
-            }
-        }
         .onChange(of: viewModel.createdGoal) { _, goal in
-            if goal != nil && !viewModel.showPaywall {
-                // If no paywall (premium user), complete immediately
+            if goal != nil {
+                // Plan created successfully - complete onboarding
                 onComplete?()
             }
         }

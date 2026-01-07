@@ -10,14 +10,12 @@
 		A10000000000000000000001 /* IdentityCalendarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* IdentityCalendarApp.swift */; };
 		A10000000000000000000050 /* AdvancedAIPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000051 /* AdvancedAIPlannerService.swift */; };
 		A10000000000000000000011 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* NotificationService.swift */; };
-		A10000000000000000000012 /* SubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000012 /* SubscriptionService.swift */; };
 		A10000000000000000000013 /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* DataService.swift */; };
 		A10000000000000000000014 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000014 /* OnboardingViewModel.swift */; };
 		A10000000000000000000015 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000015 /* CalendarViewModel.swift */; };
 		A10000000000000000000016 /* ReflectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000016 /* ReflectionViewModel.swift */; };
 		A10000000000000000000017 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* ProgressViewModel.swift */; };
 		A10000000000000000000018 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000018 /* SettingsViewModel.swift */; };
-		A10000000000000000000019 /* PaywallViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* PaywallViewModel.swift */; };
 		A10000000000000000000025 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* PrimaryButton.swift */; };
 		A10000000000000000000026 /* SelectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000026 /* SelectionCard.swift */; };
 		A10000000000000000000027 /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000027 /* ProgressBar.swift */; };
@@ -36,7 +34,6 @@
 		A10000000000000000000040 /* WeeklyReflectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000040 /* WeeklyReflectionView.swift */; };
 		A10000000000000000000041 /* ProgressTrackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000041 /* ProgressTrackingView.swift */; };
 		A10000000000000000000042 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000042 /* SettingsView.swift */; };
-		A10000000000000000000043 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000043 /* PaywallView.swift */; };
 		A10000000000000000000045 /* NewOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000046 /* NewOnboardingView.swift */; };
 		A10000000000000000000046 /* NewOnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000047 /* NewOnboardingViewModel.swift */; };
 		A10000000000000000000047 /* NewCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000048 /* NewCalendarView.swift */; };
@@ -64,14 +61,12 @@
 		A20000000000000000000001 /* IdentityCalendarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityCalendarApp.swift; sourceTree = "<group>"; };
 		A20000000000000000000051 /* AdvancedAIPlannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedAIPlannerService.swift; sourceTree = "<group>"; };
 		A20000000000000000000011 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
-		A20000000000000000000012 /* SubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionService.swift; sourceTree = "<group>"; };
 		A20000000000000000000013 /* DataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataService.swift; sourceTree = "<group>"; };
 		A20000000000000000000014 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
 		A20000000000000000000015 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
 		A20000000000000000000016 /* ReflectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionViewModel.swift; sourceTree = "<group>"; };
 		A20000000000000000000017 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
 		A20000000000000000000018 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
-		A20000000000000000000019 /* PaywallViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallViewModel.swift; sourceTree = "<group>"; };
 		A20000000000000000000025 /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		A20000000000000000000026 /* SelectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCard.swift; sourceTree = "<group>"; };
 		A20000000000000000000027 /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
@@ -90,7 +85,6 @@
 		A20000000000000000000040 /* WeeklyReflectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReflectionView.swift; sourceTree = "<group>"; };
 		A20000000000000000000041 /* ProgressTrackingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressTrackingView.swift; sourceTree = "<group>"; };
 		A20000000000000000000042 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		A20000000000000000000043 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		A20000000000000000000044 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A20000000000000000000046 /* NewOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewOnboardingView.swift; sourceTree = "<group>"; };
 		A20000000000000000000047 /* NewOnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewOnboardingViewModel.swift; sourceTree = "<group>"; };
@@ -178,7 +172,6 @@
 			children = (
 				A20000000000000000000051 /* AdvancedAIPlannerService.swift */,
 				A20000000000000000000011 /* NotificationService.swift */,
-				A20000000000000000000012 /* SubscriptionService.swift */,
 				A20000000000000000000013 /* DataService.swift */,
 				A20000000000000000000080 /* WeeklyPlanBuilder.swift */,
 				A20000000000000000000081 /* MilestoneGenerator.swift */,
@@ -199,7 +192,6 @@
 				A20000000000000000000016 /* ReflectionViewModel.swift */,
 				A20000000000000000000017 /* ProgressViewModel.swift */,
 				A20000000000000000000018 /* SettingsViewModel.swift */,
-				A20000000000000000000019 /* PaywallViewModel.swift */,
 				A20000000000000000000047 /* NewOnboardingViewModel.swift */,
 			);
 			path = ViewModels;
@@ -214,7 +206,6 @@
 				A40000000000000000000013 /* Reflection */,
 				A40000000000000000000014 /* Progress */,
 				A40000000000000000000015 /* Settings */,
-				A40000000000000000000016 /* Paywall */,
 				A40000000000000000000017 /* Future */,
 				A40000000000000000000018 /* Templates */,
 				A20000000000000000000050 /* MainTabView.swift */,
@@ -303,14 +294,6 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
-		A40000000000000000000016 /* Paywall */ = {
-			isa = PBXGroup;
-			children = (
-				A20000000000000000000043 /* PaywallView.swift */,
-			);
-			path = Paywall;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -386,7 +369,6 @@
 				A10000000000000000000073 /* AIService.swift in Sources */,
 				A10000000000000000000050 /* AdvancedAIPlannerService.swift in Sources */,
 				A10000000000000000000011 /* NotificationService.swift in Sources */,
-				A10000000000000000000012 /* SubscriptionService.swift in Sources */,
 				A10000000000000000000013 /* DataService.swift in Sources */,
 				A10000000000000000000080 /* WeeklyPlanBuilder.swift in Sources */,
 				A10000000000000000000081 /* MilestoneGenerator.swift in Sources */,
@@ -400,7 +382,6 @@
 				A10000000000000000000016 /* ReflectionViewModel.swift in Sources */,
 				A10000000000000000000017 /* ProgressViewModel.swift in Sources */,
 				A10000000000000000000018 /* SettingsViewModel.swift in Sources */,
-				A10000000000000000000019 /* PaywallViewModel.swift in Sources */,
 				A10000000000000000000046 /* NewOnboardingViewModel.swift in Sources */,
 				A10000000000000000000025 /* PrimaryButton.swift in Sources */,
 				A10000000000000000000026 /* SelectionCard.swift in Sources */,
@@ -425,7 +406,6 @@
 				A10000000000000000000061 /* ProgressRingView.swift in Sources */,
 				A10000000000000000000062 /* AchievementBadgeView.swift in Sources */,
 				A10000000000000000000042 /* SettingsView.swift in Sources */,
-				A10000000000000000000043 /* PaywallView.swift in Sources */,
 				A10000000000000000000048 /* FutureView.swift in Sources */,
 				A10000000000000000000063 /* TemplatePickerView.swift in Sources */,
 				A10000000000000000000049 /* MainTabView.swift in Sources */,

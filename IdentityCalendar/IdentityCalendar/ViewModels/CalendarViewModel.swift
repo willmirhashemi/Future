@@ -25,7 +25,6 @@ final class CalendarViewModel: ObservableObject {
     // MARK: - Dependencies
 
     private let dataService: DataService
-    private let subscriptionService: SubscriptionService
     private let smartScheduler = SmartScheduler.shared
     private let nlParser = NaturalLanguageBlockParser.shared
     private let patternAnalyzer = UserPatternAnalyzer.shared
@@ -82,12 +81,8 @@ final class CalendarViewModel: ObservableObject {
 
     // MARK: - Initialization
 
-    init(
-        dataService: DataService = .shared,
-        subscriptionService: SubscriptionService = .shared
-    ) {
+    init(dataService: DataService = .shared) {
         self.dataService = dataService
-        self.subscriptionService = subscriptionService
 
         loadBlocks()
         checkForReflection()

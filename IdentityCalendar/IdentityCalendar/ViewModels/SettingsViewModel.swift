@@ -18,33 +18,17 @@ final class SettingsViewModel: ObservableObject {
 
     @Published var showPauseConfirmation = false
     @Published var showResetConfirmation = false
-    @Published var showPaywall = false
     @Published var isPaused = false
 
     // MARK: - Dependencies
 
     private let dataService: DataService
     private let notificationService: NotificationService
-    private let subscriptionService: SubscriptionService
 
     // MARK: - Computed Properties
 
     var activeGoal: IdentityGoal? {
         dataService.activeGoal
-    }
-
-    var isPremium: Bool {
-        subscriptionService.isPremium
-    }
-
-    var subscriptionStatusText: String {
-        if isPremium {
-            if let days = subscriptionService.subscription.daysRemaining {
-                return "Pro • \(days) days remaining"
-            }
-            return "Identity Pro"
-        }
-        return "Free Plan"
     }
 
     var planConfidence: PlanConfidence {
@@ -59,12 +43,10 @@ final class SettingsViewModel: ObservableObject {
 
     init(
         dataService: DataService = .shared,
-        notificationService: NotificationService = .shared,
-        subscriptionService: SubscriptionService = .shared
+        notificationService: NotificationService = .shared
     ) {
         self.dataService = dataService
         self.notificationService = notificationService
-        self.subscriptionService = subscriptionService
 
         loadSettings()
     }
@@ -206,33 +188,22 @@ final class SettingsViewModel: ObservableObject {
         showResetConfirmation = false
     }
 
-    // MARK: - Premium
-
-    func showUpgrade() {
-        Haptics.tap()
-        showPaywall = true
-    }
-
-    func dismissPaywall() {
-        showPaywall = false
-    }
-
     // MARK: - External Links
 
     func openPrivacyPolicy() {
-        if let url = URL(string: "https://identitycalendar.com/privacy") {
+        if let url = URL(string: "https://endlessfuture.app/privacy") {
             UIApplication.shared.open(url)
         }
     }
 
     func openTermsOfService() {
-        if let url = URL(string: "https://identitycalendar.com/terms") {
+        if let url = URL(string: "https://endlessfuture.app/terms") {
             UIApplication.shared.open(url)
         }
     }
 
     func openSupport() {
-        if let url = URL(string: "https://identitycalendar.com/support") {
+        if let url = URL(string: "https://endlessfuture.app/support") {
             UIApplication.shared.open(url)
         }
     }

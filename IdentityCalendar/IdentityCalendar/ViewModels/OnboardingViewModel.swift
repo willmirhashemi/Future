@@ -15,14 +15,12 @@ final class OnboardingViewModel: ObservableObject {
     @Published var planConfidenceValue: Double = 0.5
     @Published var isGeneratingPlan = false
     @Published var generationError: String?
-    @Published var showPaywall = false
     @Published var createdGoal: IdentityGoal?
 
     // MARK: - Dependencies
 
     private let dataService: DataService
     private let aiPlanner: AIPlannerService
-    private let subscriptionService: SubscriptionService
 
     // MARK: - Computed Properties
 
@@ -66,12 +64,10 @@ final class OnboardingViewModel: ObservableObject {
 
     init(
         dataService: DataService = .shared,
-        aiPlanner: AIPlannerService? = nil,
-        subscriptionService: SubscriptionService = .shared
+        aiPlanner: AIPlannerService? = nil
     ) {
         self.dataService = dataService
         self.aiPlanner = aiPlanner ?? (FeatureFlags.useMockAI ? MockAIPlannerService() : MockAIPlannerService())
-        self.subscriptionService = subscriptionService
     }
 
     // MARK: - Navigation
@@ -202,12 +198,6 @@ final class OnboardingViewModel: ObservableObject {
 
                 Haptics.success()
 
-                // Show paywall after plan generation (for non-premium users)
-                if !subscriptionService.isPremium {
-                    try? await Task.sleep(nanoseconds: 500_000_000) // Brief delay for UX
-                    showPaywall = true
-                }
-
             } catch {
                 isGeneratingPlan = false
                 generationError = "Unable to generate your plan. Please try again."
@@ -222,10 +212,6 @@ final class OnboardingViewModel: ObservableObject {
         generatePlan()
     }
 
-    func dismissPaywall() {
-        showPaywall = false
-    }
-
     // MARK: - Reset
 
     func reset() {
@@ -238,7 +224,6 @@ final class OnboardingViewModel: ObservableObject {
         planConfidenceValue = 0.5
         isGeneratingPlan = false
         generationError = nil
-        showPaywall = false
         createdGoal = nil
     }
 }

@@ -8,15 +8,6 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
-                // Subscription section
-                Section {
-                    SubscriptionRow(
-                        statusText: viewModel.subscriptionStatusText,
-                        isPremium: viewModel.isPremium,
-                        onUpgrade: viewModel.showUpgrade
-                    )
-                }
-
                 // Goal settings (if active goal exists)
                 if viewModel.activeGoal != nil {
                     Section("Goal Settings") {
@@ -221,11 +212,6 @@ struct SettingsView: View {
                     .fontWeight(.medium)
                 }
             }
-            .sheet(isPresented: $viewModel.showPaywall) {
-                PaywallView(source: .settings) {
-                    viewModel.dismissPaywall()
-                }
-            }
             .confirmationDialog(
                 "Pause your goal?",
                 isPresented: $viewModel.showPauseConfirmation,
@@ -273,44 +259,6 @@ struct SettingsRow: View {
                     .foregroundColor(.appSecondaryText)
             }
         }
-    }
-}
-
-/// Subscription status row
-struct SubscriptionRow: View {
-    let statusText: String
-    let isPremium: Bool
-    let onUpgrade: () -> Void
-
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(statusText)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundColor(.appPrimaryText)
-
-                if !isPremium {
-                    Text("Upgrade for unlimited features")
-                        .font(.caption)
-                        .foregroundColor(.appSecondaryText)
-                }
-            }
-
-            Spacer()
-
-            if !isPremium {
-                Button("Upgrade") {
-                    onUpgrade()
-                }
-                .font(.subheadline.weight(.semibold))
-                .foregroundColor(.white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(Color.appAccent)
-                .clipShape(Capsule())
-            }
-        }
-        .padding(.vertical, 4)
     }
 }
 
