@@ -1,8 +1,9 @@
 import Foundation
 
 // MARK: - AI Integration Service
-/// Unified service for external AI API calls (OpenAI/Claude)
+/// Unified service for external AI API calls (OpenAI/Claude/Gemini)
 /// Falls back gracefully when API unavailable
+/// Supports secure backend proxy for Gemini API
 
 @MainActor
 final class AIIntegrationService: ObservableObject {
@@ -10,24 +11,44 @@ final class AIIntegrationService: ObservableObject {
 
     // MARK: - Configuration
 
-    enum AIProvider: String {
+    enum AIProvider: String, CaseIterable {
         case openai = "openai"
         case claude = "claude"
+        case gemini = "gemini" // Uses secure backend proxy
+
+        var displayName: String {
+            switch self {
+            case .openai: return "OpenAI"
+            case .claude: return "Claude"
+            case .gemini: return "Gemini (Recommended)"
+            }
+        }
+
+        var description: String {
+            switch self {
+            case .openai: return "GPT-4o Mini"
+            case .claude: return "Claude 3 Haiku"
+            case .gemini: return "Gemini 1.5 Flash via secure backend"
+            }
+        }
     }
 
     struct Config {
-        var provider: AIProvider = .openai
+        var provider: AIProvider = .gemini // Default to Gemini
         var apiKey: String = ""
+        var backendURL: String = "http://localhost:3000" // For Gemini backend
         var baseURL: String {
             switch provider {
             case .openai: return "https://api.openai.com/v1"
             case .claude: return "https://api.anthropic.com/v1"
+            case .gemini: return backendURL // Uses backend proxy
             }
         }
         var model: String {
             switch provider {
             case .openai: return "gpt-4o-mini"
             case .claude: return "claude-3-haiku-20240307"
+            case .gemini: return "gemini-1.5-flash"
             }
         }
     }
@@ -46,11 +67,33 @@ final class AIIntegrationService: ObservableObject {
 
     // MARK: - Configuration
 
-    func configure(provider: AIProvider, apiKey: String) {
+    func configure(provider: AIProvider, apiKey: String = "", backendURL: String? = nil) {
         config.provider = provider
         config.apiKey = apiKey
-        isConfigured = !apiKey.isEmpty
+
+        if let backendURL = backendURL {
+            config.backendURL = backendURL
+        }
+
+        // Gemini uses backend (no API key needed on client)
+        // Other providers need API key
+        if provider == .gemini {
+            isConfigured = true // Backend handles the API key
+        } else {
+            isConfigured = !apiKey.isEmpty
+        }
+
         saveConfig()
+    }
+
+    /// Configure to use Gemini backend (recommended - most secure)
+    func configureGeminiBackend(backendURL: String = "http://localhost:3000") {
+        configure(provider: .gemini, backendURL: backendURL)
+    }
+
+    /// Check if Gemini backend is available
+    func checkGeminiBackendHealth() async -> Bool {
+        return await GeminiBackendService.shared.healthCheck()
     }
 
     private func loadConfig() {
@@ -60,13 +103,23 @@ final class AIIntegrationService: ObservableObject {
         }
         if let key = UserDefaults.standard.string(forKey: "ai_api_key") {
             config.apiKey = key
-            isConfigured = !key.isEmpty
+        }
+        if let backendURL = UserDefaults.standard.string(forKey: "ai_backend_url") {
+            config.backendURL = backendURL
+        }
+
+        // Set isConfigured based on provider
+        if config.provider == .gemini {
+            isConfigured = true
+        } else {
+            isConfigured = !config.apiKey.isEmpty
         }
     }
 
     private func saveConfig() {
         UserDefaults.standard.set(config.provider.rawValue, forKey: "ai_provider")
         UserDefaults.standard.set(config.apiKey, forKey: "ai_api_key")
+        UserDefaults.standard.set(config.backendURL, forKey: "ai_backend_url")
     }
 
     // MARK: - API Calls
@@ -175,6 +228,11 @@ final class AIIntegrationService: ObservableObject {
         isProcessing = true
         defer { isProcessing = false }
 
+        // For Gemini, use the secure backend service
+        if config.provider == .gemini {
+            return try await sendGeminiPrompt(prompt)
+        }
+
         var request: URLRequest
         var body: Data
 
@@ -200,6 +258,10 @@ final class AIIntegrationService: ObservableObject {
                 "messages": [["role": "user", "content": prompt]]
             ]
             body = try JSONSerialization.data(withJSONObject: payload)
+
+        case .gemini:
+            // Already handled above, but needed for exhaustive switch
+            return try await sendGeminiPrompt(prompt)
         }
 
         request.httpMethod = "POST"
@@ -215,6 +277,16 @@ final class AIIntegrationService: ObservableObject {
         }
 
         return try extractContent(from: data)
+    }
+
+    /// Send prompt to Gemini via secure backend
+    private func sendGeminiPrompt(_ prompt: String) async throws -> String {
+        do {
+            let response = try await GeminiBackendService.shared.chat(message: prompt)
+            return response
+        } catch {
+            throw AIError.requestFailed
+        }
     }
 
     private func extractContent(from data: Data) throws -> String {
