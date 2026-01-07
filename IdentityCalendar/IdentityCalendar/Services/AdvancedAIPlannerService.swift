@@ -183,6 +183,16 @@ final class AdvancedAIPlannerService: AIPlannerService {
             break
         }
 
+        // Feature 1: Apply soft recovery mode adjustments
+        // This happens invisibly - user never knows they're in "recovery"
+        let momentum = DataService.shared.getMomentumState()
+        modifiedBlockCount = AIService.shared.adjustBlockCount(baseCount: modifiedBlockCount, momentum: momentum)
+
+        // Adjust duration if in recovery
+        if momentum.loadFactor < 1.0 {
+            durationMultiplier *= momentum.loadFactor
+        }
+
         return scheduleOptimizer.generateWeekBlocks(
             domainPlan: domainPlan,
             weekStart: startDate,

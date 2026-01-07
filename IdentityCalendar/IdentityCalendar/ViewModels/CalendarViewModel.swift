@@ -104,6 +104,26 @@ final class CalendarViewModel: ObservableObject {
         }
 
         currentWeekTheme = dataService.currentWeekTheme(for: goal)
+
+        // Feature 2 & 3: Ensure anchor and classification for today's blocks
+        ensureBlocksProcessed(for: goal)
+    }
+
+    /// Process blocks for anchor selection and classification (Features 2 & 3)
+    private func ensureBlocksProcessed(for goal: IdentityGoal) {
+        // Ensure today has an anchor task
+        dataService.ensureAnchorForDay(Date(), goal: goal)
+
+        // Classify blocks for dopamine-aware planning
+        dataService.classifyAndBalanceDay(Date(), goal: goal)
+
+        // Reload if changes were made
+        switch viewMode {
+        case .week:
+            blocksForDisplay = dataService.blocksForWeek(containing: selectedDate, goal: goal)
+        case .day:
+            blocksForDisplay = dataService.blocksForDate(selectedDate, goal: goal)
+        }
     }
 
     func refresh() {

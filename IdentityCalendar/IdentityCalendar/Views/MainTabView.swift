@@ -3,7 +3,10 @@ import SwiftUI
 /// Main tab view with Calendar and Future sections
 struct MainTabView: View {
     @State private var selectedTab: AppTab = .calendar
+    @State private var showDailyReflection = false
     @Environment(\.appColorScheme) private var colorScheme
+
+    private let dataService = DataService.shared
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -24,6 +27,22 @@ struct MainTabView: View {
             )
         }
         .ignoresSafeArea(.keyboard)
+        // Feature 4: Daily reflection prompt (subtle, end-of-day)
+        .sheet(isPresented: $showDailyReflection) {
+            DailyReflectionSheet()
+                .presentationDetents([.height(280)])
+                .presentationDragIndicator(.visible)
+        }
+        .onAppear {
+            checkForDailyReflection()
+        }
+    }
+
+    private func checkForDailyReflection() {
+        // Delay check to not interrupt app launch
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            showDailyReflection = dataService.shouldShowDailyReflection()
+        }
     }
 }
 
@@ -134,9 +153,101 @@ struct TabBarBackground: View {
     }
 }
 
+// ============================================================================
+// MARK: - Feature 4: Daily Reflection Sheet
+// ============================================================================
+
+/// Minimal end-of-day reflection - one question, 10 seconds max, always skippable
+/// No guilt, no reminders, no streaks - just a gentle check-in
+struct DailyReflectionSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.appColorScheme) private var colorScheme
+    @State private var reflectionText = ""
+    @FocusState private var isFocused: Bool
+
+    private let dataService = DataService.shared
+    private let prompt: DailyReflectionPrompt
+
+    init() {
+        self.prompt = DataService.shared.getDailyReflectionPrompt()
+    }
+
+    var body: some View {
+        VStack(spacing: 20) {
+            // Simple header
+            Text(prompt.question)
+                .font(.title3.weight(.medium))
+                .foregroundColor(AppTheme.primaryText(colorScheme))
+                .multilineTextAlignment(.center)
+                .padding(.top, 8)
+
+            // Text input - minimal, not overwhelming
+            TextField(prompt.placeholder, text: $reflectionText, axis: .vertical)
+                .font(.body)
+                .foregroundColor(AppTheme.primaryText(colorScheme))
+                .padding(12)
+                .background(AppTheme.secondaryBackground(colorScheme))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .lineLimit(2...4)
+                .focused($isFocused)
+
+            Spacer()
+
+            // Action buttons - skip is always easy to access
+            HStack(spacing: 16) {
+                // Skip button - prominent, no guilt
+                Button {
+                    Haptics.tap()
+                    dataService.recordDailyReflection(note: nil, skipped: true)
+                    dismiss()
+                } label: {
+                    Text("Skip")
+                        .font(.body.weight(.medium))
+                        .foregroundColor(AppTheme.secondaryText(colorScheme))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(AppTheme.secondaryBackground(colorScheme))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+
+                // Done button
+                Button {
+                    Haptics.success()
+                    dataService.recordDailyReflection(
+                        note: reflectionText.isEmpty ? nil : reflectionText,
+                        skipped: false
+                    )
+                    dismiss()
+                } label: {
+                    Text("Done")
+                        .font(.body.weight(.semibold))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(AppTheme.accent)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+        .padding(20)
+        .background(AppTheme.background(colorScheme))
+        .onAppear {
+            // Auto-focus for quick input
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                isFocused = true
+            }
+        }
+    }
+}
+
 // MARK: - Preview
 
 #Preview {
     MainTabView()
+        .themed()
+}
+
+#Preview("Daily Reflection") {
+    DailyReflectionSheet()
         .themed()
 }

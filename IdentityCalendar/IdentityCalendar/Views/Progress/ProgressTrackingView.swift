@@ -23,6 +23,9 @@ struct ProgressTrackingView: View {
                         message: viewModel.streakMessage
                     )
 
+                    // Feature 5: Trust indicator (subtle, no streaks/numbers)
+                    TrustIndicatorView()
+
                     // Weekly stats chart
                     if !viewModel.weeklyStats.isEmpty {
                         WeeklyProgressSection(stats: viewModel.weeklyStats)
@@ -308,8 +311,57 @@ struct StatCard: View {
     }
 }
 
+// ============================================================================
+// MARK: - Feature 5: Trust Indicator View
+// ============================================================================
+
+/// Subtle trust indicator - no numbers, no pressure, just calm progress language
+/// Never resets to zero, focuses on long-term pattern, not daily pressure
+struct TrustIndicatorView: View {
+    private let dataService = DataService.shared
+    private var trustIndicator: TrustIndicator {
+        dataService.getTrustIndicator()
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Subtle progress bar (not front-and-center)
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    // Background track
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.appSecondaryBackground)
+                        .frame(height: 6)
+
+                    // Progress fill
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(trustIndicator.indicatorColor)
+                        .frame(width: geo.size.width * trustIndicator.trustLevel, height: 6)
+                }
+            }
+            .frame(height: 6)
+
+            // Status message - calm, non-judgmental
+            Text(trustIndicator.statusMessage)
+                .font(.caption)
+                .foregroundColor(.appSecondaryText)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(Color.appSecondaryBackground.opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+}
+
 // MARK: - Preview
 
 #Preview {
     ProgressTrackingView()
+}
+
+#Preview("Trust Indicator") {
+    VStack {
+        TrustIndicatorView()
+    }
+    .padding()
 }

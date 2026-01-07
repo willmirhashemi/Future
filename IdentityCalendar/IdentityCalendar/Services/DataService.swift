@@ -167,6 +167,11 @@ final class DataService: ObservableObject {
         }
         // Track engagement and check achievements
         updateEngagementForBlockCompletion(block)
+
+        // Feature 2: Track anchor completion for "day success"
+        if block.isAnchor {
+            handleAnchorCompletion(block)
+        }
     }
 
     func skipBlock(_ block: PlanBlock) {
@@ -814,6 +819,145 @@ final class DataService: ObservableObject {
         activeGoal = nil
     }
     #endif
+}
+
+// ============================================================================
+// MARK: - NEW FEATURES SUPPORT
+// ============================================================================
+
+extension DataService {
+    // MARK: - Feature 1: Soft Recovery Mode Support
+
+    /// Get recent engagements for momentum calculation
+    func getRecentEngagements(days: Int = 7) -> [DailyEngagement] {
+        guard let user = currentUser else { return [] }
+        let calendar = Calendar.current
+        let cutoff = calendar.date(byAdding: .day, value: -days, to: Date()) ?? Date()
+
+        return user.dailyEngagements
+            .filter { $0.date >= cutoff }
+            .sorted { $0.date < $1.date }
+    }
+
+    /// Get momentum state for planning adjustments (Feature 1)
+    func getMomentumState() -> MomentumState {
+        let engagements = getRecentEngagements(days: 7)
+        return AIService.shared.calculateMomentumState(from: engagements)
+    }
+
+    // MARK: - Feature 2: Daily Anchor Task
+
+    /// Ensure each day has exactly one anchor task
+    func ensureAnchorForDay(_ date: Date, goal: IdentityGoal) {
+        let calendar = Calendar.current
+        let dayStart = calendar.startOfDay(for: date)
+        let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart)!
+
+        let dayBlocks = goal.planBlocks.filter {
+            $0.startDateTime >= dayStart && $0.startDateTime < dayEnd
+        }
+
+        // Check if anchor already exists
+        let hasAnchor = dayBlocks.contains { $0.isAnchor }
+        guard !hasAnchor, !dayBlocks.isEmpty else { return }
+
+        // Select best anchor using AI logic
+        if let anchor = AIService.shared.selectAnchorTask(from: dayBlocks, goal: goal) {
+            anchor.isAnchor = true
+            saveContext()
+        }
+    }
+
+    /// Update anchor completion status when block is completed
+    func handleAnchorCompletion(_ block: PlanBlock) {
+        guard block.isAnchor else { return }
+
+        let engagement = getOrCreateTodayEngagement()
+        engagement.anchorCompleted = true
+        saveContext()
+    }
+
+    /// Get today's anchor task
+    func getTodayAnchor(goal: IdentityGoal) -> PlanBlock? {
+        let today = Calendar.current.startOfDay(for: Date())
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+
+        return goal.planBlocks.first {
+            $0.startDateTime >= today &&
+            $0.startDateTime < tomorrow &&
+            $0.isAnchor
+        }
+    }
+
+    // MARK: - Feature 3: Dopamine-Aware Classification
+
+    /// Classify all blocks for a day and ensure balance
+    func classifyAndBalanceDay(_ date: Date, goal: IdentityGoal) {
+        let calendar = Calendar.current
+        let dayStart = calendar.startOfDay(for: date)
+        let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart)!
+
+        let dayBlocks = goal.planBlocks.filter {
+            $0.startDateTime >= dayStart && $0.startDateTime < dayEnd
+        }
+
+        // Classify unclassified blocks
+        for block in dayBlocks where block.taskClassification == nil {
+            block.taskClassification = AIService.shared.classifyTask(block, goal: goal)
+        }
+
+        saveContext()
+    }
+
+    // MARK: - Feature 4: End-of-Day Reflection
+
+    /// Check if daily reflection prompt should be shown
+    func shouldShowDailyReflection() -> Bool {
+        guard let engagement = getTodayEngagement() else { return false }
+
+        // Don't show if already shown today
+        if engagement.reflectionPromptShown { return false }
+
+        // Show after 7pm if there was any activity
+        let hour = Calendar.current.component(.hour, from: Date())
+        return hour >= 19 && engagement.blocksScheduled > 0
+    }
+
+    /// Record daily reflection response
+    func recordDailyReflection(note: String?, skipped: Bool) {
+        let engagement = getOrCreateTodayEngagement()
+        engagement.reflectionPromptShown = true
+        engagement.reflectionSkipped = skipped
+
+        if let note = note, !note.isEmpty {
+            engagement.reflectionNote = note
+        }
+
+        saveContext()
+    }
+
+    /// Get appropriate reflection prompt for today
+    func getDailyReflectionPrompt() -> DailyReflectionPrompt {
+        let engagement = getTodayEngagement()
+        let anchorCompleted = engagement?.anchorCompleted ?? false
+        let completionRate = engagement?.completionRate ?? 0
+
+        return DailyReflectionPrompt.selectPrompt(
+            anchorCompleted: anchorCompleted,
+            completionRate: completionRate
+        )
+    }
+
+    // MARK: - Feature 5: Trust Indicator
+
+    /// Get current trust indicator
+    func getTrustIndicator() -> TrustIndicator {
+        guard let user = currentUser else {
+            return TrustIndicator(successfulDays: 0, totalTrackedDays: 0, longestConsistentRun: 0)
+        }
+
+        return AIService.shared.calculateTrustIndicator(from: user.dailyEngagements)
+    }
 }
 
 // MARK: - Preview Support

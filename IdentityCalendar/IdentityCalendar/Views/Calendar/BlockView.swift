@@ -6,11 +6,20 @@ struct BlockView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            // Title
-            Text(block.title)
-                .font(.caption2.weight(.medium))
-                .foregroundColor(textColor)
-                .lineLimit(1)
+            // Title with subtle anchor indicator (Feature 2)
+            HStack(spacing: 3) {
+                // Anchor indicator: subtle dot, not attention-grabbing
+                if block.isAnchor {
+                    Circle()
+                        .fill(block.blockType.color.opacity(0.8))
+                        .frame(width: 4, height: 4)
+                }
+
+                Text(block.title)
+                    .font(.caption2.weight(.medium))
+                    .foregroundColor(textColor)
+                    .lineLimit(1)
+            }
 
             // Duration (only if block is tall enough)
             if block.durationMinutes >= 30 {
@@ -34,7 +43,7 @@ struct BlockView: View {
         .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 4, style: .continuous)
-                .strokeBorder(borderColor, lineWidth: 1)
+                .strokeBorder(borderColor, lineWidth: block.isAnchor ? 1.5 : 1)
         )
     }
 

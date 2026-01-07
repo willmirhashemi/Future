@@ -290,6 +290,185 @@ enum AIError: Error, LocalizedError {
 }
 
 // ============================================================================
+// MARK: - INTELLIGENT PLANNING EXTENSIONS
+// ============================================================================
+
+extension AIService {
+    // MARK: - Feature 1: Soft Recovery Mode
+
+    /// Analyzes recent engagement to detect if user needs recovery mode
+    /// This is invisible to the user - no "recovery" UI, just lighter load
+    func calculateMomentumState(from engagements: [DailyEngagement], windowDays: Int = 7) -> MomentumState {
+        let calendar = Calendar.current
+        let cutoff = calendar.date(byAdding: .day, value: -windowDays, to: Date()) ?? Date()
+
+        let recentEngagements = engagements.filter { $0.date >= cutoff }
+
+        guard !recentEngagements.isEmpty else {
+            // New user or no recent data - start gently
+            return MomentumState(
+                recentCompletionRate: 0.5,
+                missedDaysInWindow: 0,
+                averageBlocksPerDay: 3
+            )
+        }
+
+        let totalScheduled = recentEngagements.reduce(0) { $0 + $1.blocksScheduled }
+        let totalCompleted = recentEngagements.reduce(0) { $0 + $1.blocksCompleted }
+        let completionRate = totalScheduled > 0 ? Double(totalCompleted) / Double(totalScheduled) : 0
+
+        // Count days with zero completions (but had scheduled blocks)
+        let missedDays = recentEngagements.filter { $0.blocksScheduled > 0 && $0.blocksCompleted == 0 }.count
+
+        let avgBlocks = Double(totalScheduled) / Double(max(1, recentEngagements.count))
+
+        return MomentumState(
+            recentCompletionRate: completionRate,
+            missedDaysInWindow: missedDays,
+            averageBlocksPerDay: avgBlocks
+        )
+    }
+
+    /// Adjusts block count based on momentum state (recovery mode)
+    func adjustBlockCount(baseCount: Int, momentum: MomentumState) -> Int {
+        let adjusted = Double(baseCount) * momentum.loadFactor
+        return max(1, Int(adjusted.rounded()))
+    }
+
+    /// Adjusts block duration based on momentum state
+    func adjustDuration(baseDuration: Int, momentum: MomentumState) -> Int {
+        if momentum.loadFactor < 0.8 {
+            // In recovery: shorter blocks are less overwhelming
+            return max(15, Int(Double(baseDuration) * 0.75))
+        }
+        return baseDuration
+    }
+
+    // MARK: - Feature 2: Daily Anchor Selection
+
+    /// Selects the most important task to be the day's anchor
+    /// Criteria: growth tasks preferred, reasonable duration, aligns with goals
+    func selectAnchorTask(from blocks: [PlanBlock], goal: IdentityGoal) -> PlanBlock? {
+        // Filter to unanchored, scheduled blocks
+        let candidates = blocks.filter { $0.status == .scheduled && !$0.isAnchor }
+
+        guard !candidates.isEmpty else { return nil }
+
+        // Scoring: prefer growth tasks, focus blocks, reasonable duration
+        let scored = candidates.map { block -> (PlanBlock, Double) in
+            var score = 0.0
+
+            // Growth tasks are best anchors
+            if block.taskClassification == .growth {
+                score += 3.0
+            } else if block.taskClassification == .maintenance {
+                score += 1.5
+            } else {
+                score += 0.5
+            }
+
+            // Focus blocks are good anchors
+            if block.blockType == .focus {
+                score += 2.0
+            } else if block.blockType == .habit {
+                score += 1.5
+            }
+
+            // Prefer 30-60 minute tasks (achievable but meaningful)
+            if block.durationMinutes >= 30 && block.durationMinutes <= 60 {
+                score += 1.0
+            }
+
+            // High priority boosts score
+            if block.priority == .high || block.priority == .critical {
+                score += 1.0
+            }
+
+            return (block, score)
+        }
+
+        // Return highest scored block
+        return scored.max(by: { $0.1 < $1.1 })?.0
+    }
+
+    // MARK: - Feature 3: Dopamine-Aware Classification
+
+    /// Classifies a task based on its characteristics
+    func classifyTask(_ block: PlanBlock, goal: IdentityGoal) -> TaskClassification {
+        // Quick wins (< 20 min, habit/light type) = Momentum
+        if block.durationMinutes <= 20 || block.blockType == .light {
+            return .momentum
+        }
+
+        // Review and habit blocks typically = Maintenance
+        if block.blockType == .review || block.blockType == .habit {
+            return .maintenance
+        }
+
+        // Focus blocks, longer duration, high priority = Growth
+        if block.blockType == .focus || block.durationMinutes >= 45 {
+            return .growth
+        }
+
+        // Default to maintenance
+        return .maintenance
+    }
+
+    /// Ensures daily plan has good dopamine balance
+    /// Returns true if balance is good, or suggests adjustments
+    func checkDopamineBalance(blocks: [PlanBlock]) -> (isBalanced: Bool, suggestion: String?) {
+        let classifications = blocks.compactMap { $0.taskClassification }
+
+        guard !classifications.isEmpty else {
+            return (true, nil)
+        }
+
+        let growthCount = classifications.filter { $0 == .growth }.count
+        let momentumCount = classifications.filter { $0 == .momentum }.count
+
+        // Too many growth tasks in a row can cause burnout
+        if growthCount > 3 && momentumCount == 0 {
+            return (false, "Consider adding a quick win between focus sessions")
+        }
+
+        // All momentum tasks might not feel meaningful
+        if momentumCount == classifications.count && classifications.count > 2 {
+            return (false, "Consider adding one meaningful task")
+        }
+
+        return (true, nil)
+    }
+
+    // MARK: - Feature 5: Trust Indicator Calculation
+
+    /// Calculates trust indicator from engagement history
+    func calculateTrustIndicator(from engagements: [DailyEngagement]) -> TrustIndicator {
+        let successfulDays = engagements.filter { $0.anchorCompleted }.count
+        let totalDays = engagements.count
+
+        // Calculate longest consistent run
+        var longestRun = 0
+        var currentRun = 0
+        let sortedEngagements = engagements.sorted { $0.date < $1.date }
+
+        for engagement in sortedEngagements {
+            if engagement.anchorCompleted {
+                currentRun += 1
+                longestRun = max(longestRun, currentRun)
+            } else {
+                currentRun = 0
+            }
+        }
+
+        return TrustIndicator(
+            successfulDays: successfulDays,
+            totalTrackedDays: totalDays,
+            longestConsistentRun: longestRun
+        )
+    }
+}
+
+// ============================================================================
 // MARK: - MOCK AI SERVICE (for testing/preview)
 // ============================================================================
 

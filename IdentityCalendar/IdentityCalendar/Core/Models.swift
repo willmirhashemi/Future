@@ -348,6 +348,11 @@ final class PlanBlock {
     var energyLevel: EnergyLevel?
     var tips: [String]?
 
+    // Feature 2: Daily Anchor - one non-negotiable task per day
+    var isAnchor: Bool
+    // Feature 3: Dopamine-aware classification for AI planning
+    var taskClassification: TaskClassification?
+
     var status: BlockStatus
     var completedAt: Date?
     var skippedAt: Date?
@@ -387,7 +392,9 @@ final class PlanBlock {
         category: String? = nil,
         priority: BlockPriority? = nil,
         energyLevel: EnergyLevel? = nil,
-        tips: [String]? = nil
+        tips: [String]? = nil,
+        isAnchor: Bool = false,
+        taskClassification: TaskClassification? = nil
     ) {
         self.id = id
         self.createdAt = createdAt
@@ -410,6 +417,8 @@ final class PlanBlock {
         self.priority = priority
         self.energyLevel = energyLevel
         self.tips = tips
+        self.isAnchor = isAnchor
+        self.taskClassification = taskClassification
         self.wasReduced = false
         self.wasMoved = false
         self.moveCount = 0
@@ -418,6 +427,10 @@ final class PlanBlock {
     func markAsCompleted() {
         status = .completed
         completedAt = Date()
+    }
+
+    func markAsInProgress() {
+        status = .inProgress
     }
 
     func markAsSkipped() {
@@ -499,6 +512,23 @@ enum BlockStatus: String, Codable {
         case .completed: return "checkmark.circle.fill"
         case .skipped: return "forward.fill"
         case .missed: return "minus.circle"
+        }
+    }
+}
+
+// MARK: - Dopamine-Aware Task Classification (Feature 3)
+/// Internal classification for AI planning - not prominently shown to users
+enum TaskClassification: String, Codable {
+    case momentum    // Easy, quick wins - builds confidence
+    case maintenance // Keep life stable - necessary but not growth
+    case growth      // Meaningful but effortful - core progress
+
+    /// Weight for daily balance calculations (AI internal use)
+    var effortWeight: Double {
+        switch self {
+        case .momentum: return 0.3
+        case .maintenance: return 0.5
+        case .growth: return 1.0
         }
     }
 }
@@ -804,16 +834,22 @@ enum AchievementType: String, Codable, CaseIterable {
     case weekWarrior = "week_warrior"
     case twoWeekTitan = "two_week_titan"
     case monthlyMaster = "monthly_master"
+    case quarterChampion = "quarter_champion"
     case tenBlocks = "ten_blocks"
     case fiftyBlocks = "fifty_blocks"
     case hundredBlocks = "hundred_blocks"
+    case fiveHundredBlocks = "five_hundred_blocks"
     case earlyBird = "early_bird"
     case nightOwl = "night_owl"
+    case weekendWarrior = "weekend_warrior"
     case firstMilestone = "first_milestone"
     case halfwayHero = "halfway_hero"
     case goalGetter = "goal_getter"
     case reflector = "reflector"
+    case adapter = "adapter"
     case perfectWeek = "perfect_week"
+    case newYearNewYou = "new_year_new_you"
+    case comebackKid = "comeback_kid"
 
     var displayName: String {
         switch self {
@@ -821,16 +857,22 @@ enum AchievementType: String, Codable, CaseIterable {
         case .weekWarrior: return "Week Warrior"
         case .twoWeekTitan: return "Two Week Titan"
         case .monthlyMaster: return "Monthly Master"
+        case .quarterChampion: return "Quarter Champion"
         case .tenBlocks: return "Getting Started"
         case .fiftyBlocks: return "Making Progress"
         case .hundredBlocks: return "Century Club"
+        case .fiveHundredBlocks: return "Block Master"
         case .earlyBird: return "Early Bird"
         case .nightOwl: return "Night Owl"
+        case .weekendWarrior: return "Weekend Warrior"
         case .firstMilestone: return "Milestone Maker"
         case .halfwayHero: return "Halfway Hero"
         case .goalGetter: return "Goal Getter"
         case .reflector: return "Deep Thinker"
+        case .adapter: return "Flexible Mind"
         case .perfectWeek: return "Perfect Week"
+        case .newYearNewYou: return "Fresh Start"
+        case .comebackKid: return "Comeback"
         }
     }
 
@@ -840,16 +882,22 @@ enum AchievementType: String, Codable, CaseIterable {
         case .weekWarrior: return "Maintain a 7-day streak"
         case .twoWeekTitan: return "Maintain a 14-day streak"
         case .monthlyMaster: return "Maintain a 30-day streak"
+        case .quarterChampion: return "Maintain a 90-day streak"
         case .tenBlocks: return "Complete 10 blocks"
         case .fiftyBlocks: return "Complete 50 blocks"
         case .hundredBlocks: return "Complete 100 blocks"
+        case .fiveHundredBlocks: return "Complete 500 blocks"
         case .earlyBird: return "Complete 5 blocks before 8 AM"
         case .nightOwl: return "Complete 5 blocks after 8 PM"
+        case .weekendWarrior: return "Stay active on 4 weekends"
         case .firstMilestone: return "Complete your first milestone"
         case .halfwayHero: return "Reach 50% of your goal"
         case .goalGetter: return "Complete an entire goal"
         case .reflector: return "Complete 4 weekly reflections"
+        case .adapter: return "Reschedule or reduce 10 blocks"
         case .perfectWeek: return "Complete every block in a week"
+        case .newYearNewYou: return "Complete a block on New Year's Day"
+        case .comebackKid: return "Return after 7 days away"
         }
     }
 
@@ -859,27 +907,33 @@ enum AchievementType: String, Codable, CaseIterable {
         case .weekWarrior: return "flame"
         case .twoWeekTitan: return "flame.fill"
         case .monthlyMaster: return "crown"
+        case .quarterChampion: return "crown.fill"
         case .tenBlocks: return "square.stack"
         case .fiftyBlocks: return "square.stack.fill"
         case .hundredBlocks: return "star"
+        case .fiveHundredBlocks: return "star.fill"
         case .earlyBird: return "sunrise"
         case .nightOwl: return "moon.stars"
+        case .weekendWarrior: return "sun.max"
         case .firstMilestone: return "flag"
         case .halfwayHero: return "chart.pie"
         case .goalGetter: return "trophy"
         case .reflector: return "brain.head.profile"
+        case .adapter: return "arrow.triangle.2.circlepath"
         case .perfectWeek: return "checkmark.seal"
+        case .newYearNewYou: return "sparkles"
+        case .comebackKid: return "arrow.uturn.up"
         }
     }
 
     var color: Color {
         switch self {
         case .firstStep, .tenBlocks: return AppTheme.accent
-        case .weekWarrior, .fiftyBlocks, .earlyBird, .nightOwl: return AppTheme.accentBlue
-        case .twoWeekTitan, .hundredBlocks, .reflector: return AppTheme.accentPurple
-        case .monthlyMaster, .perfectWeek: return AppTheme.accentAmber
-        case .firstMilestone, .halfwayHero: return AppTheme.accent
-        case .goalGetter: return AppTheme.error
+        case .weekWarrior, .fiftyBlocks, .earlyBird, .nightOwl, .weekendWarrior: return AppTheme.accentBlue
+        case .twoWeekTitan, .hundredBlocks, .reflector, .adapter: return AppTheme.accentPurple
+        case .monthlyMaster, .perfectWeek, .quarterChampion, .fiveHundredBlocks: return AppTheme.accentAmber
+        case .firstMilestone, .halfwayHero, .comebackKid: return AppTheme.accent
+        case .goalGetter, .newYearNewYou: return AppTheme.error
         }
     }
 
@@ -889,13 +943,17 @@ enum AchievementType: String, Codable, CaseIterable {
         case .weekWarrior: return 7
         case .twoWeekTitan: return 14
         case .monthlyMaster: return 30
+        case .quarterChampion: return 90
         case .tenBlocks: return 10
         case .fiftyBlocks: return 50
         case .hundredBlocks: return 100
+        case .fiveHundredBlocks: return 500
         case .earlyBird, .nightOwl: return 5
-        case .firstMilestone, .goalGetter, .perfectWeek: return 1
+        case .weekendWarrior: return 4
+        case .firstMilestone, .goalGetter, .perfectWeek, .newYearNewYou, .comebackKid: return 1
         case .halfwayHero: return 50
         case .reflector: return 4
+        case .adapter: return 10
         }
     }
 }
@@ -1023,10 +1081,38 @@ final class DailyEngagement {
     var latestBlockTime: Date?
     var engagedWithApp: Bool
 
+    // Feature 2: Track if anchor task was completed
+    var anchorCompleted: Bool
+
+    // Feature 4: End-of-day micro reflection (10 seconds max)
+    var reflectionNote: String?
+    var reflectionPromptShown: Bool
+    var reflectionSkipped: Bool
+
     @Relationship(inverse: \User.dailyEngagements) var user: User?
 
     var completionRate: Double {
         blocksScheduled > 0 ? Double(blocksCompleted) / Double(blocksScheduled) : 0
+    }
+
+    /// Day is considered "successful" if anchor was completed (Feature 2)
+    var isDaySuccessful: Bool { anchorCompleted }
+
+    /// Check if this is a weekend day
+    var isWeekend: Bool { Calendar.current.isDateInWeekend(date) }
+
+    /// Record block completion - updates engagement metrics
+    func recordBlockCompletion(block: PlanBlock) {
+        blocksCompleted += 1
+        totalMinutesCompleted += block.durationMinutes
+
+        // Track time bounds
+        if earliestBlockTime == nil || block.startDateTime < (earliestBlockTime ?? .distantFuture) {
+            earliestBlockTime = block.startDateTime
+        }
+        if latestBlockTime == nil || block.endDateTime > (latestBlockTime ?? .distantPast) {
+            latestBlockTime = block.endDateTime
+        }
     }
 
     init(
@@ -1038,7 +1124,11 @@ final class DailyEngagement {
         blocksMoved: Int = 0,
         blocksReduced: Int = 0,
         totalMinutesCompleted: Int = 0,
-        engagedWithApp: Bool = true
+        engagedWithApp: Bool = true,
+        anchorCompleted: Bool = false,
+        reflectionNote: String? = nil,
+        reflectionPromptShown: Bool = false,
+        reflectionSkipped: Bool = false
     ) {
         self.id = id
         self.date = date
@@ -1049,6 +1139,10 @@ final class DailyEngagement {
         self.blocksReduced = blocksReduced
         self.totalMinutesCompleted = totalMinutesCompleted
         self.engagedWithApp = engagedWithApp
+        self.anchorCompleted = anchorCompleted
+        self.reflectionNote = reflectionNote
+        self.reflectionPromptShown = reflectionPromptShown
+        self.reflectionSkipped = reflectionSkipped
     }
 }
 
@@ -1113,6 +1207,9 @@ struct WeeklyStats {
     let completedBlocks: Int
     let skippedBlocks: Int
     let totalMinutes: Int
+    let averageCompletionRate: Double
+    let bestDay: String?
+    let mostProductiveHour: Int?
 
     var completionRate: Double { totalBlocks > 0 ? Double(completedBlocks) / Double(totalBlocks) : 0 }
     var hoursCompleted: Double { Double(totalMinutes) / 60.0 }
@@ -1122,6 +1219,7 @@ struct StreakInfo {
     let currentStreak: Int
     let longestStreak: Int
     let lastActiveDate: Date?
+    let streakStartDate: Date?
     let isActiveToday: Bool
 
     var streakAtRisk: Bool {
@@ -1146,5 +1244,181 @@ struct ProgressRingData {
     static func streak(current: Int, target: Int = 7) -> ProgressRingData {
         let progress = min(1.0, Double(current) / Double(target))
         return ProgressRingData(progress: progress, label: "\(current)", sublabel: "Day Streak", color: current >= 7 ? AppTheme.accentAmber : AppTheme.accent)
+    }
+}
+
+// ============================================================================
+// MARK: - FEATURE 1: SOFT RECOVERY MODE (Invisible Reset System)
+// ============================================================================
+
+/// Represents the user's current momentum state - used internally by AI
+/// Never exposed to users as "failure" or "recovery"
+struct MomentumState {
+    let recentCompletionRate: Double  // Last 3-7 days
+    let missedDaysInWindow: Int       // Days with 0 completions
+    let averageBlocksPerDay: Double   // Baseline
+
+    /// Determines load adjustment factor (0.5 = lighter, 1.0 = normal, 1.2 = increased)
+    var loadFactor: Double {
+        // Soft recovery: reduce load if struggling
+        if missedDaysInWindow >= 2 || recentCompletionRate < 0.3 {
+            return 0.5  // Significant reduction
+        } else if missedDaysInWindow >= 1 || recentCompletionRate < 0.5 {
+            return 0.7  // Moderate reduction
+        } else if recentCompletionRate > 0.85 {
+            return 1.1  // Slight increase if doing well
+        }
+        return 1.0  // Normal
+    }
+
+    /// Recovery-aware AI messages (reframing, not failure language)
+    var aiTone: RecoveryTone {
+        if loadFactor < 0.8 {
+            return .rebuilding
+        } else if loadFactor > 1.0 {
+            return .expanding
+        }
+        return .steady
+    }
+
+    /// Duration of adjusted state (in days)
+    var adjustmentDuration: Int {
+        if loadFactor < 0.6 { return 3 }
+        if loadFactor < 0.8 { return 2 }
+        return 1
+    }
+}
+
+enum RecoveryTone {
+    case rebuilding  // "Let's reset and rebuild momentum"
+    case steady      // Normal operation
+    case expanding   // "You're ready for more"
+
+    var aiPhrases: [String] {
+        switch self {
+        case .rebuilding:
+            return [
+                "Let's ease back in.",
+                "We'll rebuild momentum together.",
+                "Starting fresh with a lighter load.",
+                "One step at a time."
+            ]
+        case .steady:
+            return [
+                "Keeping the rhythm going.",
+                "Steady progress today.",
+                "You've got this."
+            ]
+        case .expanding:
+            return [
+                "Ready for a bit more challenge.",
+                "Building on your momentum.",
+                "Let's push a little further."
+            ]
+        }
+    }
+
+    var randomPhrase: String {
+        aiPhrases.randomElement() ?? aiPhrases[0]
+    }
+}
+
+// ============================================================================
+// MARK: - FEATURE 4: END-OF-DAY REFLECTION PROMPTS
+// ============================================================================
+
+/// Simple reflection prompts - one question, 10 seconds max, always skippable
+enum DailyReflectionPrompt: CaseIterable {
+    case whatWentWell
+    case whatWasHard
+    case energyLevel
+    case oneWin
+    case obstacle
+
+    var question: String {
+        switch self {
+        case .whatWentWell: return "What went well today?"
+        case .whatWasHard: return "What made today harder than expected?"
+        case .energyLevel: return "How was your energy today?"
+        case .oneWin: return "What's one small win from today?"
+        case .obstacle: return "Anything get in your way?"
+        }
+    }
+
+    var placeholder: String {
+        switch self {
+        case .whatWentWell: return "Something positive..."
+        case .whatWasHard: return "A challenge or obstacle..."
+        case .energyLevel: return "High, medium, low..."
+        case .oneWin: return "Even something small..."
+        case .obstacle: return "Or nothing, that's fine too..."
+        }
+    }
+
+    /// Select prompt based on day's outcome for more relevant questions
+    static func selectPrompt(anchorCompleted: Bool, completionRate: Double) -> DailyReflectionPrompt {
+        if anchorCompleted && completionRate > 0.7 {
+            // Good day - ask about wins
+            return [.whatWentWell, .oneWin].randomElement()!
+        } else if completionRate < 0.3 {
+            // Tough day - ask gently about obstacles
+            return [.whatWasHard, .obstacle, .energyLevel].randomElement()!
+        }
+        // Average day - mix of prompts
+        return allCases.randomElement()!
+    }
+}
+
+// ============================================================================
+// MARK: - FEATURE 5: TIME-TO-TRUST INDICATOR
+// ============================================================================
+
+/// Represents consistency confidence - never resets to zero, no streaks
+/// Focuses on long-term pattern rather than daily pressure
+struct TrustIndicator {
+    let successfulDays: Int       // Days where anchor was completed
+    let totalTrackedDays: Int     // Total days in system
+    let longestConsistentRun: Int // Best streak (internal use only)
+
+    /// Trust level as a smooth progression (0.0 to 1.0)
+    var trustLevel: Double {
+        guard totalTrackedDays > 0 else { return 0 }
+        // Weighted: recent success matters more but never goes to zero
+        let baseLevel = Double(successfulDays) / Double(max(totalTrackedDays, 7))
+        // Minimum 10% if they've had any success - never feels like starting over
+        let minimum = successfulDays > 0 ? 0.1 : 0
+        return max(minimum, min(1.0, baseLevel))
+    }
+
+    /// Human-readable status - calm, non-judgmental language
+    var statusMessage: String {
+        switch trustLevel {
+        case 0..<0.2:
+            return "Getting started"
+        case 0.2..<0.4:
+            return "Building foundation"
+        case 0.4..<0.6:
+            return "Consistency emerging"
+        case 0.6..<0.8:
+            return "Routine stabilizing"
+        case 0.8...1.0:
+            return "Momentum established"
+        default:
+            return "In progress"
+        }
+    }
+
+    /// Subtle color for UI (muted, not attention-grabbing)
+    var indicatorColor: Color {
+        switch trustLevel {
+        case 0..<0.3:
+            return AppTheme.secondaryText
+        case 0.3..<0.6:
+            return AppTheme.accentBlue.opacity(0.7)
+        case 0.6..<0.85:
+            return AppTheme.accent.opacity(0.7)
+        default:
+            return AppTheme.accent
+        }
     }
 }
