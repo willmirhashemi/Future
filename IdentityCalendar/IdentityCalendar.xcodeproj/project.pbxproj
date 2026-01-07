@@ -8,15 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		A10000000000000000000001 /* IdentityCalendarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* IdentityCalendarApp.swift */; };
-		A10000000000000000000002 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* User.swift */; };
-		A10000000000000000000003 /* IdentityGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* IdentityGoal.swift */; };
-		A10000000000000000000004 /* Milestone.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000004 /* Milestone.swift */; };
-		A10000000000000000000005 /* WeeklyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000005 /* WeeklyTheme.swift */; };
-		A10000000000000000000006 /* PlanBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* PlanBlock.swift */; };
-		A10000000000000000000007 /* WeeklyReflection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* WeeklyReflection.swift */; };
-		A10000000000000000000008 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* Subscription.swift */; };
-		A10000000000000000000009 /* AIPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* AIPlannerService.swift */; };
-		A10000000000000000000010 /* MockAIPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000010 /* MockAIPlannerService.swift */; };
 		A10000000000000000000050 /* AdvancedAIPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000051 /* AdvancedAIPlannerService.swift */; };
 		A10000000000000000000011 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* NotificationService.swift */; };
 		A10000000000000000000012 /* SubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000012 /* SubscriptionService.swift */; };
@@ -27,11 +18,6 @@
 		A10000000000000000000017 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* ProgressViewModel.swift */; };
 		A10000000000000000000018 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000018 /* SettingsViewModel.swift */; };
 		A10000000000000000000019 /* PaywallViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* PaywallViewModel.swift */; };
-		A10000000000000000000020 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* Date+Extensions.swift */; };
-		A10000000000000000000021 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000021 /* Color+Extensions.swift */; };
-		A10000000000000000000022 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000022 /* View+Extensions.swift */; };
-		A10000000000000000000023 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000023 /* Constants.swift */; };
-		A10000000000000000000024 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000024 /* Haptics.swift */; };
 		A10000000000000000000025 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* PrimaryButton.swift */; };
 		A10000000000000000000026 /* SelectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000026 /* SelectionCard.swift */; };
 		A10000000000000000000027 /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000027 /* ProgressBar.swift */; };
@@ -51,26 +37,31 @@
 		A10000000000000000000041 /* ProgressTrackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000041 /* ProgressTrackingView.swift */; };
 		A10000000000000000000042 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000042 /* SettingsView.swift */; };
 		A10000000000000000000043 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000043 /* PaywallView.swift */; };
-		A10000000000000000000044 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000045 /* ThemeManager.swift */; };
 		A10000000000000000000045 /* NewOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000046 /* NewOnboardingView.swift */; };
 		A10000000000000000000046 /* NewOnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000047 /* NewOnboardingViewModel.swift */; };
 		A10000000000000000000047 /* NewCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000048 /* NewCalendarView.swift */; };
 		A10000000000000000000048 /* FutureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000049 /* FutureView.swift */; };
 		A10000000000000000000049 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000050 /* MainTabView.swift */; };
+		A10000000000000000000060 /* AIInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000060 /* AIInputView.swift */; };
+		A10000000000000000000061 /* ProgressRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000061 /* ProgressRingView.swift */; };
+		A10000000000000000000062 /* AchievementBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000062 /* AchievementBadgeView.swift */; };
+		A10000000000000000000063 /* TemplatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000063 /* TemplatePickerView.swift */; };
+		A10000000000000000000070 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000070 /* Theme.swift */; };
+		A10000000000000000000071 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000071 /* Extensions.swift */; };
+		A10000000000000000000072 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000072 /* Models.swift */; };
+		A10000000000000000000073 /* AIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000073 /* AIService.swift */; };
+		A10000000000000000000080 /* WeeklyPlanBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000080 /* WeeklyPlanBuilder.swift */; };
+		A10000000000000000000081 /* MilestoneGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000081 /* MilestoneGenerator.swift */; };
+		A10000000000000000000082 /* NaturalLanguageBlockParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000082 /* NaturalLanguageBlockParser.swift */; };
+		A10000000000000000000083 /* SmartScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000083 /* SmartScheduler.swift */; };
+		A10000000000000000000084 /* PersonalizedAIPlannerEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000084 /* PersonalizedAIPlannerEngine.swift */; };
+		A10000000000000000000085 /* DomainKnowledgeBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000085 /* DomainKnowledgeBase.swift */; };
+		A10000000000000000000086 /* UserPatternAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000086 /* UserPatternAnalyzer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A20000000000000000000000 /* IdentityCalendar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IdentityCalendar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000000000000000000001 /* IdentityCalendarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityCalendarApp.swift; sourceTree = "<group>"; };
-		A20000000000000000000002 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
-		A20000000000000000000003 /* IdentityGoal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityGoal.swift; sourceTree = "<group>"; };
-		A20000000000000000000004 /* Milestone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Milestone.swift; sourceTree = "<group>"; };
-		A20000000000000000000005 /* WeeklyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyTheme.swift; sourceTree = "<group>"; };
-		A20000000000000000000006 /* PlanBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanBlock.swift; sourceTree = "<group>"; };
-		A20000000000000000000007 /* WeeklyReflection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReflection.swift; sourceTree = "<group>"; };
-		A20000000000000000000008 /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
-		A20000000000000000000009 /* AIPlannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIPlannerService.swift; sourceTree = "<group>"; };
-		A20000000000000000000010 /* MockAIPlannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAIPlannerService.swift; sourceTree = "<group>"; };
 		A20000000000000000000051 /* AdvancedAIPlannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedAIPlannerService.swift; sourceTree = "<group>"; };
 		A20000000000000000000011 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		A20000000000000000000012 /* SubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionService.swift; sourceTree = "<group>"; };
@@ -81,11 +72,6 @@
 		A20000000000000000000017 /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
 		A20000000000000000000018 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		A20000000000000000000019 /* PaywallViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallViewModel.swift; sourceTree = "<group>"; };
-		A20000000000000000000020 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
-		A20000000000000000000021 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
-		A20000000000000000000022 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
-		A20000000000000000000023 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		A20000000000000000000024 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		A20000000000000000000025 /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		A20000000000000000000026 /* SelectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCard.swift; sourceTree = "<group>"; };
 		A20000000000000000000027 /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
@@ -106,12 +92,26 @@
 		A20000000000000000000042 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A20000000000000000000043 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		A20000000000000000000044 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A20000000000000000000045 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		A20000000000000000000046 /* NewOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewOnboardingView.swift; sourceTree = "<group>"; };
 		A20000000000000000000047 /* NewOnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewOnboardingViewModel.swift; sourceTree = "<group>"; };
 		A20000000000000000000048 /* NewCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCalendarView.swift; sourceTree = "<group>"; };
 		A20000000000000000000049 /* FutureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureView.swift; sourceTree = "<group>"; };
 		A20000000000000000000050 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		A20000000000000000000060 /* AIInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIInputView.swift; sourceTree = "<group>"; };
+		A20000000000000000000061 /* ProgressRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRingView.swift; sourceTree = "<group>"; };
+		A20000000000000000000062 /* AchievementBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementBadgeView.swift; sourceTree = "<group>"; };
+		A20000000000000000000063 /* TemplatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatePickerView.swift; sourceTree = "<group>"; };
+		A20000000000000000000070 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		A20000000000000000000071 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		A20000000000000000000072 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		A20000000000000000000073 /* AIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIService.swift; sourceTree = "<group>"; };
+		A20000000000000000000080 /* WeeklyPlanBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyPlanBuilder.swift; sourceTree = "<group>"; };
+		A20000000000000000000081 /* MilestoneGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneGenerator.swift; sourceTree = "<group>"; };
+		A20000000000000000000082 /* NaturalLanguageBlockParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NaturalLanguageBlockParser.swift; sourceTree = "<group>"; };
+		A20000000000000000000083 /* SmartScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartScheduler.swift; sourceTree = "<group>"; };
+		A20000000000000000000084 /* PersonalizedAIPlannerEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalizedAIPlannerEngine.swift; sourceTree = "<group>"; };
+		A20000000000000000000085 /* DomainKnowledgeBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainKnowledgeBase.swift; sourceTree = "<group>"; };
+		A20000000000000000000086 /* UserPatternAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPatternAnalyzer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,12 +137,10 @@
 			isa = PBXGroup;
 			children = (
 				A40000000000000000000003 /* App */,
-				A40000000000000000000004 /* Models */,
+				A40000000000000000000020 /* Core */,
 				A40000000000000000000005 /* Services */,
 				A40000000000000000000006 /* ViewModels */,
 				A40000000000000000000007 /* Views */,
-				A40000000000000000000008 /* Extensions */,
-				A40000000000000000000009 /* Utilities */,
 				A20000000000000000000044 /* Info.plist */,
 			);
 			path = IdentityCalendar;
@@ -164,29 +162,31 @@
 			path = App;
 			sourceTree = "<group>";
 		};
-		A40000000000000000000004 /* Models */ = {
+		A40000000000000000000020 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				A20000000000000000000002 /* User.swift */,
-				A20000000000000000000003 /* IdentityGoal.swift */,
-				A20000000000000000000004 /* Milestone.swift */,
-				A20000000000000000000005 /* WeeklyTheme.swift */,
-				A20000000000000000000006 /* PlanBlock.swift */,
-				A20000000000000000000007 /* WeeklyReflection.swift */,
-				A20000000000000000000008 /* Subscription.swift */,
+				A20000000000000000000070 /* Theme.swift */,
+				A20000000000000000000071 /* Extensions.swift */,
+				A20000000000000000000072 /* Models.swift */,
+				A20000000000000000000073 /* AIService.swift */,
 			);
-			path = Models;
+			path = Core;
 			sourceTree = "<group>";
 		};
 		A40000000000000000000005 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				A20000000000000000000009 /* AIPlannerService.swift */,
-				A20000000000000000000010 /* MockAIPlannerService.swift */,
 				A20000000000000000000051 /* AdvancedAIPlannerService.swift */,
 				A20000000000000000000011 /* NotificationService.swift */,
 				A20000000000000000000012 /* SubscriptionService.swift */,
 				A20000000000000000000013 /* DataService.swift */,
+				A20000000000000000000080 /* WeeklyPlanBuilder.swift */,
+				A20000000000000000000081 /* MilestoneGenerator.swift */,
+				A20000000000000000000082 /* NaturalLanguageBlockParser.swift */,
+				A20000000000000000000083 /* SmartScheduler.swift */,
+				A20000000000000000000084 /* PersonalizedAIPlannerEngine.swift */,
+				A20000000000000000000085 /* DomainKnowledgeBase.swift */,
+				A20000000000000000000086 /* UserPatternAnalyzer.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -216,6 +216,7 @@
 				A40000000000000000000015 /* Settings */,
 				A40000000000000000000016 /* Paywall */,
 				A40000000000000000000017 /* Future */,
+				A40000000000000000000018 /* Templates */,
 				A20000000000000000000050 /* MainTabView.swift */,
 			);
 			path = Views;
@@ -229,24 +230,12 @@
 			path = Future;
 			sourceTree = "<group>";
 		};
-		A40000000000000000000008 /* Extensions */ = {
+		A40000000000000000000018 /* Templates */ = {
 			isa = PBXGroup;
 			children = (
-				A20000000000000000000020 /* Date+Extensions.swift */,
-				A20000000000000000000021 /* Color+Extensions.swift */,
-				A20000000000000000000022 /* View+Extensions.swift */,
+				A20000000000000000000063 /* TemplatePickerView.swift */,
 			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		A40000000000000000000009 /* Utilities */ = {
-			isa = PBXGroup;
-			children = (
-				A20000000000000000000023 /* Constants.swift */,
-				A20000000000000000000024 /* Haptics.swift */,
-				A20000000000000000000045 /* ThemeManager.swift */,
-			);
-			path = Utilities;
+			path = Templates;
 			sourceTree = "<group>";
 		};
 		A40000000000000000000010 /* Components */ = {
@@ -283,6 +272,7 @@
 				A20000000000000000000038 /* BlockView.swift */,
 				A20000000000000000000039 /* BlockDetailSheet.swift */,
 				A20000000000000000000048 /* NewCalendarView.swift */,
+				A20000000000000000000060 /* AIInputView.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -299,6 +289,8 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000041 /* ProgressTrackingView.swift */,
+				A20000000000000000000061 /* ProgressRingView.swift */,
+				A20000000000000000000062 /* AchievementBadgeView.swift */,
 			);
 			path = Progress;
 			sourceTree = "<group>";
@@ -388,30 +380,28 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000001 /* IdentityCalendarApp.swift in Sources */,
-				A10000000000000000000002 /* User.swift in Sources */,
-				A10000000000000000000003 /* IdentityGoal.swift in Sources */,
-				A10000000000000000000004 /* Milestone.swift in Sources */,
-				A10000000000000000000005 /* WeeklyTheme.swift in Sources */,
-				A10000000000000000000006 /* PlanBlock.swift in Sources */,
-				A10000000000000000000007 /* WeeklyReflection.swift in Sources */,
-				A10000000000000000000008 /* Subscription.swift in Sources */,
-				A10000000000000000000009 /* AIPlannerService.swift in Sources */,
-				A10000000000000000000010 /* MockAIPlannerService.swift in Sources */,
+				A10000000000000000000070 /* Theme.swift in Sources */,
+				A10000000000000000000071 /* Extensions.swift in Sources */,
+				A10000000000000000000072 /* Models.swift in Sources */,
+				A10000000000000000000073 /* AIService.swift in Sources */,
 				A10000000000000000000050 /* AdvancedAIPlannerService.swift in Sources */,
 				A10000000000000000000011 /* NotificationService.swift in Sources */,
 				A10000000000000000000012 /* SubscriptionService.swift in Sources */,
 				A10000000000000000000013 /* DataService.swift in Sources */,
+				A10000000000000000000080 /* WeeklyPlanBuilder.swift in Sources */,
+				A10000000000000000000081 /* MilestoneGenerator.swift in Sources */,
+				A10000000000000000000082 /* NaturalLanguageBlockParser.swift in Sources */,
+				A10000000000000000000083 /* SmartScheduler.swift in Sources */,
+				A10000000000000000000084 /* PersonalizedAIPlannerEngine.swift in Sources */,
+				A10000000000000000000085 /* DomainKnowledgeBase.swift in Sources */,
+				A10000000000000000000086 /* UserPatternAnalyzer.swift in Sources */,
 				A10000000000000000000014 /* OnboardingViewModel.swift in Sources */,
 				A10000000000000000000015 /* CalendarViewModel.swift in Sources */,
 				A10000000000000000000016 /* ReflectionViewModel.swift in Sources */,
 				A10000000000000000000017 /* ProgressViewModel.swift in Sources */,
 				A10000000000000000000018 /* SettingsViewModel.swift in Sources */,
 				A10000000000000000000019 /* PaywallViewModel.swift in Sources */,
-				A10000000000000000000020 /* Date+Extensions.swift in Sources */,
-				A10000000000000000000021 /* Color+Extensions.swift in Sources */,
-				A10000000000000000000022 /* View+Extensions.swift in Sources */,
-				A10000000000000000000023 /* Constants.swift in Sources */,
-				A10000000000000000000024 /* Haptics.swift in Sources */,
+				A10000000000000000000046 /* NewOnboardingViewModel.swift in Sources */,
 				A10000000000000000000025 /* PrimaryButton.swift in Sources */,
 				A10000000000000000000026 /* SelectionCard.swift in Sources */,
 				A10000000000000000000027 /* ProgressBar.swift in Sources */,
@@ -422,20 +412,22 @@
 				A10000000000000000000032 /* IntensityView.swift in Sources */,
 				A10000000000000000000033 /* PlanConfidenceView.swift in Sources */,
 				A10000000000000000000034 /* PlanGenerationView.swift in Sources */,
+				A10000000000000000000045 /* NewOnboardingView.swift in Sources */,
 				A10000000000000000000035 /* CalendarView.swift in Sources */,
 				A10000000000000000000036 /* WeekView.swift in Sources */,
 				A10000000000000000000037 /* DayView.swift in Sources */,
 				A10000000000000000000038 /* BlockView.swift in Sources */,
 				A10000000000000000000039 /* BlockDetailSheet.swift in Sources */,
+				A10000000000000000000047 /* NewCalendarView.swift in Sources */,
+				A10000000000000000000060 /* AIInputView.swift in Sources */,
 				A10000000000000000000040 /* WeeklyReflectionView.swift in Sources */,
 				A10000000000000000000041 /* ProgressTrackingView.swift in Sources */,
+				A10000000000000000000061 /* ProgressRingView.swift in Sources */,
+				A10000000000000000000062 /* AchievementBadgeView.swift in Sources */,
 				A10000000000000000000042 /* SettingsView.swift in Sources */,
 				A10000000000000000000043 /* PaywallView.swift in Sources */,
-				A10000000000000000000044 /* ThemeManager.swift in Sources */,
-				A10000000000000000000045 /* NewOnboardingView.swift in Sources */,
-				A10000000000000000000046 /* NewOnboardingViewModel.swift in Sources */,
-				A10000000000000000000047 /* NewCalendarView.swift in Sources */,
 				A10000000000000000000048 /* FutureView.swift in Sources */,
+				A10000000000000000000063 /* TemplatePickerView.swift in Sources */,
 				A10000000000000000000049 /* MainTabView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -572,7 +564,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IdentityCalendar/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Identity Calendar";
+				INFOPLIST_KEY_CFBundleDisplayName = "Endless Future";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -584,7 +576,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.identitycalendar.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.endlessfuture.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -604,7 +596,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IdentityCalendar/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Identity Calendar";
+				INFOPLIST_KEY_CFBundleDisplayName = "Endless Future";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -616,7 +608,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.identitycalendar.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.endlessfuture.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
