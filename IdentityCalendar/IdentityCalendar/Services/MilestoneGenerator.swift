@@ -23,7 +23,7 @@ final class MilestoneGenerator {
         let blueprint = knowledgeBase.getBlueprint(for: analysis.domain)
         let phases = blueprint.progressionPhases
 
-        var milestones: [Milestone] = []
+        var milestones: [GeneratedMilestone] = []
 
         // Week 1: Orientation + Quick Wins
         milestones.append(generateWeek1Milestone(
@@ -141,11 +141,11 @@ final class MilestoneGenerator {
         blueprint: DomainBlueprint,
         startDate: Date,
         intensity: Intensity
-    ) -> Milestone {
+    ) -> GeneratedMilestone {
         let quickWins = getQuickWins(for: analysis.domain, blueprint: blueprint)
         let setupTasks = getSetupTasks(for: analysis.domain)
 
-        return Milestone(
+        return GeneratedMilestone(
             weekNumber: 1,
             title: "Foundation & First Wins",
             description: "Set up your environment and achieve quick wins to build momentum",
@@ -188,10 +188,10 @@ final class MilestoneGenerator {
         blueprint: DomainBlueprint,
         startDate: Date,
         intensity: Intensity
-    ) -> Milestone {
+    ) -> GeneratedMilestone {
         let coreActivities = blueprint.highLeverageActivities.prefix(2)
 
-        return Milestone(
+        return GeneratedMilestone(
             weekNumber: 2,
             title: "Measurable Progress",
             description: "Demonstrate tangible progress with measurable outcomes",
@@ -225,10 +225,10 @@ final class MilestoneGenerator {
         blueprint: DomainBlueprint,
         startDate: Date,
         intensity: Intensity
-    ) -> Milestone {
+    ) -> GeneratedMilestone {
         let validationTask = getValidationTask(for: analysis.domain)
 
-        return Milestone(
+        return GeneratedMilestone(
             weekNumber: 4,
             title: "Skill Validation",
             description: "Validate skills with a concrete output or assessment",
@@ -267,8 +267,8 @@ final class MilestoneGenerator {
         blueprint: DomainBlueprint,
         startDate: Date,
         intensity: Intensity
-    ) -> Milestone {
-        return Milestone(
+    ) -> GeneratedMilestone {
+        return GeneratedMilestone(
             weekNumber: 8,
             title: "Momentum & Proof",
             description: "Demonstrate consistent capability and build momentum",
@@ -307,8 +307,8 @@ final class MilestoneGenerator {
         blueprint: DomainBlueprint,
         startDate: Date,
         intensity: Intensity
-    ) -> Milestone {
-        return Milestone(
+    ) -> GeneratedMilestone {
+        return GeneratedMilestone(
             weekNumber: 12,
             title: "Scale & Optimize",
             description: "Scale your capability and optimize for efficiency",
@@ -592,7 +592,7 @@ final class MilestoneGenerator {
         return Int(ceil(Double(hours * 60) / 45.0))
     }
 
-    private func generateAdaptiveCheckpoints(milestones: [Milestone]) -> [AdaptiveCheckpoint] {
+    private func generateAdaptiveCheckpoints(milestones: [GeneratedMilestone]) -> [AdaptiveCheckpoint] {
         milestones.enumerated().map { index, milestone in
             AdaptiveCheckpoint(
                 weekNumber: milestone.weekNumber,
@@ -617,11 +617,11 @@ final class MilestoneGenerator {
 struct MilestoneRoadmap {
     let goalId: UUID
     let domain: GoalDomainType
-    let milestones: [Milestone]
+    let milestones: [GeneratedMilestone]
     let estimatedCompletionDate: Date
     let adaptiveCheckpoints: [AdaptiveCheckpoint]
 
-    var currentMilestone: Milestone? {
+    var currentMilestone: GeneratedMilestone? {
         let now = Date()
         return milestones.first { $0.targetDate > now }
     }
@@ -632,7 +632,7 @@ struct MilestoneRoadmap {
     }
 }
 
-struct Milestone: Identifiable {
+struct GeneratedMilestone: Identifiable {
     let id = UUID()
     let weekNumber: Int
     let title: String
