@@ -1,0 +1,47 @@
+# Environment variables (API keys)
+.env
+.env.local
+.env.*.local
+
+# Node modules
+node_modules/
+
+# Build outputs
+build/
+dist/
+.build/
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
