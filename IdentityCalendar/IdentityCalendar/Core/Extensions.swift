@@ -100,6 +100,9 @@ extension Date {
     var hour: Int { Calendar.current.component(.hour, from: self) }
     var minute: Int { Calendar.current.component(.minute, from: self) }
 
+    // Alias for dayOfWeekString
+    var weekdayString: String { dayOfWeekString }
+
     // MARK: - Date Manipulation
 
     func adding(days: Int) -> Date {

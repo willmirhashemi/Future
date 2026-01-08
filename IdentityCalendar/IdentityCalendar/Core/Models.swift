@@ -1241,6 +1241,12 @@ struct ProgressRingData {
         return ProgressRingData(progress: progress, label: "\(completed)/\(scheduled)", sublabel: "Today", color: color)
     }
 
+    static func weekly(completed: Int, scheduled: Int) -> ProgressRingData {
+        let progress = scheduled > 0 ? Double(completed) / Double(scheduled) : 0
+        let color = progress >= 0.8 ? AppTheme.accent : (progress >= 0.5 ? AppTheme.accentBlue : AppTheme.accentPurple)
+        return ProgressRingData(progress: progress, label: "\(completed)/\(scheduled)", sublabel: "This Week", color: color)
+    }
+
     static func streak(current: Int, target: Int = 7) -> ProgressRingData {
         let progress = min(1.0, Double(current) / Double(target))
         return ProgressRingData(progress: progress, label: "\(current)", sublabel: "Day Streak", color: current >= 7 ? AppTheme.accentAmber : AppTheme.accent)
@@ -1412,7 +1418,7 @@ struct TrustIndicator {
     var indicatorColor: Color {
         switch trustLevel {
         case 0..<0.3:
-            return AppTheme.secondaryText
+            return AppTheme.textSecondary
         case 0.3..<0.6:
             return AppTheme.accentBlue.opacity(0.7)
         case 0.6..<0.85:

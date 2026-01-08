@@ -5,6 +5,7 @@ import Foundation
 /// evidence-based scheduling algorithms, and domain-specific intelligence
 /// to create highly personalized and effective plans.
 
+@MainActor
 final class AdvancedAIPlannerService: AIPlannerService {
 
     // MARK: - Core Components

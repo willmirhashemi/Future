@@ -1,6 +1,16 @@
 import Foundation
 
 // ============================================================================
+// MARK: - AI PLANNER SERVICE PROTOCOL
+// ============================================================================
+
+/// Protocol for AI planning services
+protocol AIPlannerService {
+    func generateInitialPlan(for goal: IdentityGoal) async throws -> AIPlanResponse
+    func adaptWeeklyPlan(for goal: IdentityGoal, weekNumber: Int, feedback: WeeklyReflection?) async throws -> AIPlanResponse
+}
+
+// ============================================================================
 // MARK: - AI SERVICE (Unified AI Integration)
 // ============================================================================
 
@@ -520,5 +530,25 @@ final class MockAIService {
         }
 
         return blocks
+    }
+}
+
+// ============================================================================
+// MARK: - MOCK AI PLANNER SERVICE (for testing/preview)
+// ============================================================================
+
+/// Mock implementation of AIPlannerService for testing and previews
+@MainActor
+final class MockAIPlannerService: AIPlannerService {
+    func generateInitialPlan(for goal: IdentityGoal) async throws -> AIPlanResponse {
+        // Simulate network delay
+        try await Task.sleep(nanoseconds: 500_000_000)
+        return MockAIService.generateMockPlan(for: goal)
+    }
+
+    func adaptWeeklyPlan(for goal: IdentityGoal, weekNumber: Int, feedback: WeeklyReflection?) async throws -> AIPlanResponse {
+        // Simulate network delay
+        try await Task.sleep(nanoseconds: 300_000_000)
+        return MockAIService.generateMockPlan(for: goal)
     }
 }
