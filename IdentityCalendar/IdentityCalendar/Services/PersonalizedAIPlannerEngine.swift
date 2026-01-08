@@ -645,21 +645,7 @@ struct CoreActivity {
     var preferredTimeOfDay: [TimeOfDay]
 }
 
-enum ActivityFrequency {
-    case daily
-    case timesPerWeek(Int)
-    case weekdays
-    case weekends
-    case once
-}
-
-enum TimeOfDay {
-    case earlyMorning  // 5-8am
-    case morning       // 8-12pm
-    case afternoon     // 12-5pm
-    case evening       // 5-9pm
-    case night         // 9pm+
-}
+// ActivityFrequency and TimeOfDay are defined in Models.swift
 
 struct ProvenStrategy {
     let title: String

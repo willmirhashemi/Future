@@ -17,7 +17,7 @@ final class WeeklyPlanBuilder {
     func buildWeeklyPlan(
         for milestone: Milestone,
         domain: GoalDomainType,
-        availability: Availability,
+        availability: WeeklyAvailability,
         userPatterns: UserPatterns,
         weekNumber: Int
     ) -> WeeklyExecutionPlan {
@@ -53,12 +53,68 @@ final class WeeklyPlanBuilder {
         )
     }
 
+    /// Build weekly plans for PersonalizedAIPlannerEngine
+    func buildWeeklyPlans(
+        activities: [CoreActivity],
+        milestones: [PlanMilestone],
+        availability: Availability,
+        totalWeeks: Int
+    ) -> [WeeklyExecutionPlan] {
+        var weeklyPlans: [WeeklyExecutionPlan] = []
+
+        // Convert Availability enum to weekly hours
+        let weeklyHours: Int
+        switch availability {
+        case .busy: weeklyHours = 5
+        case .normal: weeklyHours = 10
+        case .open: weeklyHours = 15
+        }
+
+        for week in 1...totalWeeks {
+            // Create blocks from activities
+            var blocks: [PlannedBlock] = []
+            var remainingHours = weeklyHours
+
+            for activity in activities {
+                guard remainingHours > 0 else { break }
+                let duration = min(activity.durationMinutes, remainingHours * 60)
+
+                blocks.append(PlannedBlock(
+                    activityName: activity.title,
+                    description: activity.description,
+                    duration: duration,
+                    blockType: activity.blockType,
+                    preferredTimeOfDay: activity.preferredTimeOfDay.first ?? .morning,
+                    energyLevel: activity.difficultyLevel >= 4 ? .high : (activity.difficultyLevel >= 2 ? .medium : .low),
+                    weekNumber: week,
+                    isFlexible: activity.difficultyLevel <= 3,
+                    priority: activity.impactScore >= 0.7 ? .high : (activity.impactScore >= 0.4 ? .medium : .low)
+                ))
+
+                remainingHours -= duration / 60
+            }
+
+            weeklyPlans.append(WeeklyExecutionPlan(
+                weekNumber: week,
+                milestone: nil,
+                blocks: blocks,
+                dailyDistribution: [:],
+                focusAreas: activities.map { $0.title },
+                weeklyQuickWin: "Complete \(blocks.count) blocks",
+                reflectionPrompts: ["How did this week go?"],
+                adjustmentTriggers: []
+            ))
+        }
+
+        return weeklyPlans
+    }
+
     // MARK: - Activity Selection
 
     private func selectActivitiesForPhase(
         phase: MilestonePhase,
         blueprint: DomainBlueprint,
-        availability: Availability
+        availability: WeeklyAvailability
     ) -> [DomainActivity] {
         let allActivities = blueprint.highLeverageActivities
 
@@ -92,7 +148,7 @@ final class WeeklyPlanBuilder {
 
     private func generateBlocks(
         from activities: [DomainActivity],
-        availability: Availability,
+        availability: WeeklyAvailability,
         userPatterns: UserPatterns,
         weekNumber: Int
     ) -> [PlannedBlock] {
@@ -190,7 +246,7 @@ final class WeeklyPlanBuilder {
     private func distributeToDays(
         blocks: [PlannedBlock],
         preferredDays: [Int],
-        availability: Availability
+        availability: WeeklyAvailability
     ) -> [Int: [PlannedBlock]] {
         var distribution: [Int: [PlannedBlock]] = [:]
         var blockIndex = 0
@@ -462,7 +518,7 @@ final class WeeklyPlanBuilder {
 
 struct WeeklyExecutionPlan {
     let weekNumber: Int
-    let milestone: Milestone
+    let milestone: Milestone?
     let blocks: [PlannedBlock]
     let dailyDistribution: [Int: [PlannedBlock]]
     let focusAreas: [String]
@@ -477,6 +533,30 @@ struct WeeklyExecutionPlan {
     var blockCount: Int {
         blocks.count
     }
+
+    /// Tasks derived from blocks for PersonalizedAIPlannerEngine compatibility
+    var tasks: [WeeklyTask] {
+        blocks.map { block in
+            WeeklyTask(
+                title: block.activityName,
+                intent: block.description,
+                durationMinutes: block.duration,
+                preferredHour: block.preferredTimeOfDay.hourRange.lowerBound + 2,
+                frequency: .timesPerWeek(1),
+                blockType: block.blockType
+            )
+        }
+    }
+}
+
+/// Task representation for PersonalizedAIPlannerEngine
+struct WeeklyTask {
+    let title: String
+    let intent: String
+    let durationMinutes: Int
+    let preferredHour: Int
+    let frequency: ActivityFrequency
+    let blockType: BlockType
 }
 
 struct PlannedBlock: Identifiable {
@@ -492,29 +572,7 @@ struct PlannedBlock: Identifiable {
     let priority: BlockPriority
 }
 
-enum TimeOfDay: String, CaseIterable {
-    case morning = "Morning"
-    case afternoon = "Afternoon"
-    case evening = "Evening"
-
-    var hourRange: ClosedRange<Int> {
-        switch self {
-        case .morning: return 6...11
-        case .afternoon: return 12...16
-        case .evening: return 17...21
-        }
-    }
-}
-
-enum BlockPriority: Int, Comparable {
-    case low = 1
-    case medium = 2
-    case high = 3
-
-    static func < (lhs: BlockPriority, rhs: BlockPriority) -> Bool {
-        lhs.rawValue < rhs.rawValue
-    }
-}
+// TimeOfDay and BlockPriority are defined in Models.swift
 
 struct AdjustmentTrigger {
     let condition: String
@@ -526,27 +584,27 @@ struct AdjustmentTrigger {
     }
 }
 
-struct Availability {
+struct WeeklyAvailability {
     let weeklyHours: Int
     let preferredDays: [Int] // 1 = Sunday, 7 = Saturday
     let maxBlocksPerDay: Int
     let blackoutTimes: [DateInterval]
 
-    static let standard = Availability(
+    static let standard = WeeklyAvailability(
         weeklyHours: 10,
         preferredDays: [2, 3, 4, 5, 6], // Mon-Fri
         maxBlocksPerDay: 3,
         blackoutTimes: []
     )
 
-    static let intensive = Availability(
+    static let intensive = WeeklyAvailability(
         weeklyHours: 20,
         preferredDays: [1, 2, 3, 4, 5, 6, 7], // All days
         maxBlocksPerDay: 4,
         blackoutTimes: []
     )
 
-    static let minimal = Availability(
+    static let minimal = WeeklyAvailability(
         weeklyHours: 5,
         preferredDays: [2, 4, 6], // Mon, Wed, Fri
         maxBlocksPerDay: 2,

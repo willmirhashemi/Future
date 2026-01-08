@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 /// Manages the calendar view state and interactions
 @MainActor

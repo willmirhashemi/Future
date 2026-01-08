@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 /// Manages the onboarding flow state and logic
 @MainActor

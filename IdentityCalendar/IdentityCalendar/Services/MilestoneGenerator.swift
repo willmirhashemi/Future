@@ -78,6 +78,62 @@ final class MilestoneGenerator {
         )
     }
 
+    /// Generate milestones for PersonalizedAIPlannerEngine
+    func generateMilestones(
+        for analysis: GoalAnalysis,
+        blueprint: DomainBlueprint,
+        timeHorizon: TimeHorizon,
+        intensity: Intensity
+    ) -> [PlanMilestone] {
+        var milestones: [PlanMilestone] = []
+        let totalWeeks = timeHorizon.weeks
+
+        // Week 1: Foundation
+        milestones.append(PlanMilestone(
+            title: "Foundation & First Wins",
+            timeframe: "Week 1",
+            weekNumber: 1
+        ))
+
+        // Week 2: Measurable Progress
+        if totalWeeks >= 2 {
+            milestones.append(PlanMilestone(
+                title: "Measurable Progress",
+                timeframe: "Week 2",
+                weekNumber: 2
+            ))
+        }
+
+        // Week 4: Skill Validation
+        if totalWeeks >= 4 {
+            milestones.append(PlanMilestone(
+                title: "Skill Validation",
+                timeframe: "Week 4",
+                weekNumber: 4
+            ))
+        }
+
+        // Week 8: Momentum Phase
+        if totalWeeks >= 8 {
+            milestones.append(PlanMilestone(
+                title: "Momentum Phase",
+                timeframe: "Week 8",
+                weekNumber: 8
+            ))
+        }
+
+        // Week 12: Scaling Phase
+        if totalWeeks >= 12 {
+            milestones.append(PlanMilestone(
+                title: "Scaling & Mastery",
+                timeframe: "Week 12",
+                weekNumber: 12
+            ))
+        }
+
+        return milestones
+    }
+
     // MARK: - Week 1: Orientation + Quick Wins
 
     private func generateWeek1Milestone(

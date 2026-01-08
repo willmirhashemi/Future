@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import Combine
 
 /// Manages all SwiftData operations
 @MainActor

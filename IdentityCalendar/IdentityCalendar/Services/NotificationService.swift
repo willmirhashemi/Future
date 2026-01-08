@@ -1,5 +1,6 @@
 import Foundation
 import UserNotifications
+import Combine
 
 /// Handles all notification-related functionality
 final class NotificationService: ObservableObject {

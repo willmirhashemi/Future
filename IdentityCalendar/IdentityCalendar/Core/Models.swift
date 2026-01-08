@@ -576,6 +576,52 @@ enum EnergyLevel: String, Codable, CaseIterable {
     }
 }
 
+enum TimeOfDay: String, Codable, CaseIterable {
+    case earlyMorning = "early_morning"  // 5-8am
+    case morning = "morning"              // 8-12pm
+    case afternoon = "afternoon"          // 12-5pm
+    case evening = "evening"              // 5-9pm
+    case night = "night"                  // 9pm+
+
+    var displayName: String {
+        switch self {
+        case .earlyMorning: return "Early Morning"
+        case .morning: return "Morning"
+        case .afternoon: return "Afternoon"
+        case .evening: return "Evening"
+        case .night: return "Night"
+        }
+    }
+
+    var hourRange: ClosedRange<Int> {
+        switch self {
+        case .earlyMorning: return 5...7
+        case .morning: return 8...11
+        case .afternoon: return 12...16
+        case .evening: return 17...20
+        case .night: return 21...23
+        }
+    }
+}
+
+enum ActivityFrequency: Codable, Equatable {
+    case daily
+    case timesPerWeek(Int)
+    case weekdays
+    case weekends
+    case once
+
+    var displayName: String {
+        switch self {
+        case .daily: return "Daily"
+        case .timesPerWeek(let count): return "\(count)x per week"
+        case .weekdays: return "Weekdays"
+        case .weekends: return "Weekends"
+        case .once: return "Once"
+        }
+    }
+}
+
 // MARK: - PlanBlock Data (for AI)
 
 extension PlanBlock {
