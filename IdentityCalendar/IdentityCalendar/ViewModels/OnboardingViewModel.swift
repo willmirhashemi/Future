@@ -68,7 +68,7 @@ final class OnboardingViewModel: ObservableObject {
         aiPlanner: AIPlannerService? = nil
     ) {
         self.dataService = dataService
-        self.aiPlanner = aiPlanner ?? (FeatureFlags.useMockAI ? MockAIPlannerService() : MockAIPlannerService())
+        self.aiPlanner = aiPlanner ?? (FeatureFlags.useMockAI ? MockAIPlannerService() : AdvancedAIPlannerService())
     }
 
     // MARK: - Navigation

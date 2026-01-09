@@ -59,7 +59,33 @@ final class AdvancedAIPlannerService: AIPlannerService {
         )
     }
 
-    func adaptWeeklyPlan(
+    /// Protocol-compliant method for weekly plan adaptation
+    func adaptWeeklyPlan(for goal: IdentityGoal, weekNumber: Int, feedback: WeeklyReflection?) async throws -> AIPlanResponse {
+        // If no feedback, just regenerate the plan
+        guard let reflection = feedback else {
+            return try await generateInitialPlan(for: goal)
+        }
+
+        // Get current blocks for the goal
+        let currentBlocks = goal.planBlocks.filter { $0.weekNumber == weekNumber }
+
+        // Use the detailed adaptation method
+        let adaptationResponse = try await adaptWeeklyPlanDetailed(
+            for: goal,
+            reflection: reflection,
+            currentBlocks: Array(currentBlocks)
+        )
+
+        // Convert AIAdaptationResponse to AIPlanResponse
+        return AIPlanResponse(
+            milestones: [],  // Keep existing milestones
+            weeklyThemes: [], // Keep existing themes
+            planBlocks: adaptationResponse.updatedBlocks
+        )
+    }
+
+    /// Detailed adaptation with full context
+    func adaptWeeklyPlanDetailed(
         for goal: IdentityGoal,
         reflection: WeeklyReflection,
         currentBlocks: [PlanBlock]
