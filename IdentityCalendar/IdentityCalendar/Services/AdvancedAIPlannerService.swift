@@ -2170,7 +2170,7 @@ final class ScheduleOptimizer {
         return selected.shuffled()
     }
 
-    private func generateTimeSlots(for energyPattern: EnergyDistribution) -> [TimeSlot] {
+    private func generateTimeSlots(for energyPattern: EnergyDistribution) -> [ScheduleTimeSlot] {
         switch energyPattern {
         case .morningHeavy:
             return [.earlyMorning, .morning, .morning, .lateMorning, .afternoon, .evening]
@@ -2181,7 +2181,7 @@ final class ScheduleOptimizer {
         }
     }
 
-    private func getOptimalTime(for blockType: BlockType, slot: TimeSlot, energyPattern: EnergyDistribution) -> (hour: Int, minute: Int) {
+    private func getOptimalTime(for blockType: BlockType, slot: ScheduleTimeSlot, energyPattern: EnergyDistribution) -> (hour: Int, minute: Int) {
         // Focus blocks go in high-energy times
         // Light blocks go in lower-energy times
         // Habits can be any time
@@ -2467,10 +2467,7 @@ struct DomainActivity {
     let skillCategory: String
 }
 
-enum ActivityFrequency {
-    case daily
-    case timesPerWeek(Int)
-}
+// ActivityFrequency is defined in Models.swift
 
 enum ActivityPhase {
     case early
@@ -2537,7 +2534,7 @@ enum DayOfWeek {
     }
 }
 
-enum TimeSlot {
+enum ScheduleTimeSlot {
     case earlyMorning
     case morning
     case lateMorning
