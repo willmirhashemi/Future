@@ -1,0 +1,77 @@
+name: EndlessCalendar
+options:
+  bundleIdPrefix: com.endlesscalendar
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "15.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: YOUR_TEAM_ID
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.9"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    INFOPLIST_FILE: EndlessCalendar/Resources/Info.plist
+
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: "10.0.0"
+  GoogleGenerativeAI:
+    url: https://github.com/google/generative-ai-swift
+    from: "0.4.0"
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    from: "7.0.0"
+
+targets:
+  EndlessCalendar:
+    type: application
+    platform: iOS
+    sources:
+      - path: EndlessCalendar
+        excludes:
+          - "**/*.plist"
+    resources:
+      - path: EndlessCalendar/Resources
+        buildPhase: resources
+    dependencies:
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseFirestore
+      - package: Firebase
+        product: FirebaseMessaging
+      - package: GoogleGenerativeAI
+      - package: GoogleSignIn
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.endlesscalendar.app
+        CODE_SIGN_ENTITLEMENTS: EndlessCalendar/EndlessCalendar.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+    entitlements:
+      path: EndlessCalendar/EndlessCalendar.entitlements
+      properties:
+        aps-environment: development
+        com.apple.developer.applesignin:
+          - Default
+
+schemes:
+  EndlessCalendar:
+    build:
+      targets:
+        EndlessCalendar: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
