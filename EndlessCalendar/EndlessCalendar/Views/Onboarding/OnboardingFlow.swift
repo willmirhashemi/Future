@@ -14,6 +14,7 @@ struct OnboardingFlow: View {
 
     enum OnboardingStep {
         case welcome
+        case authentication
         case categorySelection
         case questionnaire
         case generating
@@ -31,8 +32,11 @@ struct OnboardingFlow: View {
 
                 // Content
                 TabView(selection: $currentStep) {
-                    WelcomeStep(onContinue: { currentStep = .categorySelection })
+                    WelcomeStep(onContinue: { currentStep = .authentication })
                         .tag(OnboardingStep.welcome)
+
+                    AuthenticationStep(onComplete: { currentStep = .categorySelection })
+                        .tag(OnboardingStep.authentication)
 
                     CategorySelectionStep(
                         selectedCategory: $selectedCategory,
@@ -77,7 +81,7 @@ struct OnboardingFlow: View {
     // MARK: - Progress Indicator
     private var progressIndicator: some View {
         HStack(spacing: Theme.Spacing.xs) {
-            ForEach(0..<5) { index in
+            ForEach(0..<6) { index in
                 Capsule()
                     .fill(stepIndex >= index ? Theme.Colors.accent : Theme.Colors.textTertiary)
                     .frame(height: 4)
@@ -90,10 +94,11 @@ struct OnboardingFlow: View {
     private var stepIndex: Int {
         switch currentStep {
         case .welcome: return 0
-        case .categorySelection: return 1
-        case .questionnaire: return 2
-        case .generating: return 3
-        case .planReview: return 4
+        case .authentication: return 1
+        case .categorySelection: return 2
+        case .questionnaire: return 3
+        case .generating: return 4
+        case .planReview: return 5
         }
     }
 
