@@ -8,7 +8,7 @@ struct OnboardingFlow: View {
     @State private var currentStep: OnboardingStep = .welcome
     @State private var selectedCategory: GoalCategory?
     @State private var questionnaireResponses = QuestionnaireResponses()
-    @State private var isGeneratingPlan = false
+    @State private var generatedPlan: AIPlanResponse?
     @State private var showError = false
     @State private var errorMessage = ""
 
@@ -17,6 +17,7 @@ struct OnboardingFlow: View {
         case categorySelection
         case questionnaire
         case generating
+        case planReview
     }
 
     var body: some View {
@@ -46,8 +47,18 @@ struct OnboardingFlow: View {
                     )
                     .tag(OnboardingStep.questionnaire)
 
-                    GeneratingStep()
+                    GeneratingStep(geminiService: geminiService)
                         .tag(OnboardingStep.generating)
+
+                    if let plan = generatedPlan {
+                        PlanReviewStep(
+                            plan: plan,
+                            category: selectedCategory ?? .studyLearning,
+                            onAccept: { acceptPlan() },
+                            onRegenerate: { regeneratePlan() }
+                        )
+                        .tag(OnboardingStep.planReview)
+                    }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .animation(.easeInOut, value: currentStep)
@@ -55,6 +66,9 @@ struct OnboardingFlow: View {
         }
         .alert("Error", isPresented: $showError) {
             Button("OK", role: .cancel) {}
+            Button("Try Again") {
+                generatePlan()
+            }
         } message: {
             Text(errorMessage)
         }
@@ -63,7 +77,7 @@ struct OnboardingFlow: View {
     // MARK: - Progress Indicator
     private var progressIndicator: some View {
         HStack(spacing: Theme.Spacing.xs) {
-            ForEach(0..<4) { index in
+            ForEach(0..<5) { index in
                 Capsule()
                     .fill(stepIndex >= index ? Theme.Colors.accent : Theme.Colors.textTertiary)
                     .frame(height: 4)
@@ -79,6 +93,7 @@ struct OnboardingFlow: View {
         case .categorySelection: return 1
         case .questionnaire: return 2
         case .generating: return 3
+        case .planReview: return 4
         }
     }
 
@@ -90,15 +105,71 @@ struct OnboardingFlow: View {
 
         Task {
             do {
-                // Generate AI plan
-                let events = try await geminiService.generatePersonalizedPlan(
-                    userId: authService.currentUser?.id ?? "",
+                // Build context for AI
+                let mockUser = User(
+                    id: authService.currentUser?.id ?? "",
+                    email: authService.currentUser?.email ?? "",
+                    displayName: authService.currentUser?.displayName ?? "",
+                    preferences: UserPreferences()
+                )
+
+                let context = GeminiService.buildContext(
+                    user: mockUser,
                     category: category,
                     responses: questionnaireResponses
                 )
 
+                // Generate strategic plan
+                let plan = try await geminiService.generateStrategicPlan(context: context)
+                generatedPlan = plan
+
+                // Move to plan review
+                await MainActor.run {
+                    currentStep = .planReview
+                }
+
+            } catch {
+                await MainActor.run {
+                    errorMessage = error.localizedDescription
+                    showError = true
+                    currentStep = .questionnaire
+                }
+            }
+        }
+    }
+
+    // MARK: - Regenerate Plan
+    private func regeneratePlan() {
+        generatedPlan = nil
+        generatePlan()
+    }
+
+    // MARK: - Accept Plan
+    private func acceptPlan() {
+        guard let category = selectedCategory,
+              let plan = generatedPlan,
+              let userId = authService.currentUser?.id else { return }
+
+        Task {
+            do {
+                // Convert schedule actions to calendar events
+                let events = geminiService.convertToEvents(
+                    actions: plan.scheduleActions,
+                    userId: userId,
+                    category: category
+                )
+
                 // Save events to Firestore
                 _ = try await firestoreService.createEvents(events)
+
+                // Save the AI plan for reference
+                let storedPlan = StoredAIPlan(
+                    userId: userId,
+                    response: plan,
+                    userInputSummary: questionnaireResponses.specificGoal
+                )
+                // Note: Would need to add this method to FirestoreService
+                // _ = try await firestoreService.saveStoredPlan(storedPlan)
 
                 // Complete onboarding
                 try await authService.completeOnboarding(
@@ -111,9 +182,10 @@ struct OnboardingFlow: View {
                 await NotificationService.shared.scheduleRemindersForEvents(events)
 
             } catch {
-                errorMessage = error.localizedDescription
-                showError = true
-                currentStep = .questionnaire
+                await MainActor.run {
+                    errorMessage = error.localizedDescription
+                    showError = true
+                }
             }
         }
     }
@@ -148,10 +220,10 @@ struct WelcomeStep: View {
 
             // Features List
             VStack(alignment: .leading, spacing: Theme.Spacing.md) {
-                FeatureRow(icon: "brain.head.profile", text: "AI-powered personalized planning")
-                FeatureRow(icon: "calendar", text: "Daily tasks tailored to your goals")
-                FeatureRow(icon: "book", text: "Journal to track your progress")
-                FeatureRow(icon: "trophy", text: "Achievements to keep you motivated")
+                FeatureRow(icon: "brain.head.profile", text: "Strategic AI planning agent")
+                FeatureRow(icon: "calendar", text: "Personalized schedule actions")
+                FeatureRow(icon: "chart.line.uptrend.xyaxis", text: "Progress tracking & phases")
+                FeatureRow(icon: "trophy", text: "Milestones & achievements")
             }
             .padding(.horizontal, Theme.Spacing.xl)
 
@@ -562,7 +634,17 @@ struct SelectionRow: View {
 
 // MARK: - Generating Step
 struct GeneratingStep: View {
+    @ObservedObject var geminiService: GeminiService
     @State private var animationPhase = 0
+    @State private var currentTipIndex = 0
+
+    private let tips = [
+        "Our AI is analyzing your goals and constraints...",
+        "Creating a phased approach for sustainable progress...",
+        "Generating specific, actionable tasks...",
+        "Optimizing schedule for your available hours...",
+        "Identifying key milestones and checkpoints..."
+    ]
 
     var body: some View {
         VStack(spacing: Theme.Spacing.xl) {
@@ -585,26 +667,31 @@ struct GeneratingStep: View {
                         .foregroundColor(Theme.Colors.accent)
                 }
 
-                Text("Creating Your Plan")
+                Text("AI Planning Agent")
                     .font(Theme.Fonts.title())
                     .foregroundColor(Theme.Colors.textPrimary)
 
-                Text("Our AI is analyzing your goals and creating a personalized schedule just for you...")
+                Text(tips[currentTipIndex])
                     .font(Theme.Fonts.body())
                     .foregroundColor(Theme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, Theme.Spacing.xl)
+                    .animation(.easeInOut, value: currentTipIndex)
             }
 
             Spacer()
 
-            // Loading tips
+            // Info Card
             VStack(spacing: Theme.Spacing.md) {
-                Text("Did you know?")
-                    .font(Theme.Fonts.headline())
-                    .foregroundColor(Theme.Colors.accent)
+                HStack {
+                    Image(systemName: "sparkles")
+                        .foregroundColor(Theme.Colors.accent)
+                    Text("Strategic Planning")
+                        .font(Theme.Fonts.headline())
+                        .foregroundColor(Theme.Colors.accent)
+                }
 
-                Text("Consistent small steps lead to big achievements. Your plan will include daily manageable tasks.")
+                Text("Our AI creates specific, schedulable actions based on your constraints. No generic advice - only actionable steps.")
                     .font(Theme.Fonts.subheadline())
                     .foregroundColor(Theme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -620,6 +707,68 @@ struct GeneratingStep: View {
             withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
                 animationPhase = 1
             }
+
+            // Rotate tips
+            Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
+                withAnimation {
+                    currentTipIndex = (currentTipIndex + 1) % tips.count
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Plan Review Step
+struct PlanReviewStep: View {
+    let plan: AIPlanResponse
+    let category: GoalCategory
+    let onAccept: () -> Void
+    let onRegenerate: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            VStack(spacing: Theme.Spacing.sm) {
+                HStack {
+                    Image(systemName: "checkmark.seal.fill")
+                        .foregroundColor(Theme.Colors.success)
+
+                    Text("Your Plan is Ready")
+                        .font(Theme.Fonts.title2())
+                        .foregroundColor(Theme.Colors.textPrimary)
+                }
+
+                Text("Review your personalized plan before we add it to your calendar")
+                    .font(Theme.Fonts.subheadline())
+                    .foregroundColor(Theme.Colors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(Theme.Spacing.lg)
+
+            // Plan Content
+            AIPlanView(plan: plan)
+
+            // Action Buttons
+            VStack(spacing: Theme.Spacing.md) {
+                Button(action: onAccept) {
+                    HStack {
+                        Image(systemName: "calendar.badge.plus")
+                        Text("Accept & Add to Calendar")
+                    }
+                }
+                .buttonStyle(PrimaryButtonStyle())
+
+                Button(action: onRegenerate) {
+                    HStack {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                        Text("Generate New Plan")
+                    }
+                    .foregroundColor(Theme.Colors.textSecondary)
+                }
+                .buttonStyle(SecondaryButtonStyle())
+            }
+            .padding(Theme.Spacing.lg)
+            .background(Theme.Colors.secondaryBackground)
         }
     }
 }

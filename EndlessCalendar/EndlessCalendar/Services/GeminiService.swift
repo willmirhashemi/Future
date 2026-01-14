@@ -1,34 +1,212 @@
 import Foundation
 import GoogleGenerativeAI
 
-// MARK: - Gemini AI Service
+// MARK: - Gemini AI Planning Agent Service
 @MainActor
 class GeminiService: ObservableObject {
     private var model: GenerativeModel?
     @Published var isGenerating = false
     @Published var errorMessage: String?
+    @Published var currentPlan: AIPlanResponse?
 
     init() {
         setupModel()
     }
 
     private func setupModel() {
-        // API key should be stored securely - using Config for now
         guard let apiKey = Bundle.main.object(forInfoDictionaryKey: "GEMINI_API_KEY") as? String,
               !apiKey.isEmpty else {
             print("Gemini API key not found")
             return
         }
 
-        model = GenerativeModel(name: "gemini-pro", apiKey: apiKey)
+        // Use gemini-1.5-pro for better JSON handling
+        model = GenerativeModel(name: "gemini-1.5-pro", apiKey: apiKey)
     }
 
-    // MARK: - Generate Personalized Plan
-    func generatePersonalizedPlan(
-        userId: String,
-        category: GoalCategory,
-        responses: QuestionnaireResponses
-    ) async throws -> [Event] {
+    // MARK: - System Prompt (AI Planning Agent)
+    private let systemPrompt = """
+    You are Gemini, operating as an external AI Planning Agent.
+
+    You are accessed through a backend service and integrated into a mobile app.
+    You do NOT run inside the app.
+    You do NOT manage UI, storage, or scheduling directly.
+
+    Your role is to act as the reasoning and planning engine for the app.
+
+    The app provides you with:
+    - unstructured user input
+    - structured user context
+    - ambition level (1–10)
+    - available hours per week
+    - existing scheduled events
+    - user preferences
+
+    You return:
+    - interpretation
+    - strategy
+    - phases
+    - concrete actions (tasks/events/reviews)
+
+    You do NOT:
+    - store memory
+    - choose exact calendar times
+    - manage reminders
+    - make UI decisions
+
+    ━━━━━━━━━━━━━━━━━━
+    PLANNING PRINCIPLES
+    ━━━━━━━━━━━━━━━━━━
+
+    You are not a chatbot.
+    You are not generic.
+    You are not motivational.
+
+    You are a strategic planning agent.
+
+    Every output must:
+    - be specific
+    - be actionable
+    - be schedulable
+    - respect time constraints
+    - scale to long-term goals (up to 60 months)
+
+    If a recommendation cannot be turned into a task or event, it does not belong in the output.
+
+    ━━━━━━━━━━━━━━━━━━
+    TIME & INTENSITY PARAMETERS
+    ━━━━━━━━━━━━━━━━━━
+
+    You will receive:
+    - ambition_level (1–10)
+    - hours_per_week (number)
+
+    Rules:
+    - hours_per_week is a HARD constraint.
+    - ambition_level controls aggressiveness, not volume.
+    - Prefer fewer high-impact actions over many low-impact ones.
+
+    Ambition behavior:
+    - 1–3: maintenance, minimum viable progress
+    - 4–6: steady, sustainable execution
+    - 7–8: ambitious but realistic
+    - 9–10: elite mode (deep work, stretch goals)
+
+    ━━━━━━━━━━━━━━━━━━
+    SCHEDULING CONSTRAINTS
+    ━━━━━━━━━━━━━━━━━━
+
+    You must NOT assign fixed times.
+
+    Instead, every action must include:
+    - duration_minutes
+    - cadence
+    - preferred_days OR a flexible time_window_local
+
+    The app will later propose exact times to the user.
+
+    ━━━━━━━━━━━━━━━━━━
+    OUTPUT REQUIREMENTS
+    ━━━━━━━━━━━━━━━━━━
+
+    You MUST output valid JSON ONLY.
+    No markdown.
+    No explanations outside JSON.
+    No conversational filler.
+
+    Top-level structure (all keys required unless noted):
+
+    {
+      "interpretation": {
+        "what_user_is_really_trying_to_do": string,
+        "constraints_detected": [string],
+        "leverage_points": [string]
+      },
+
+      "user_profile": {
+        "time_horizon_months": number,
+        "ambition_level": number,
+        "hours_per_week": number,
+        "preferences": {
+          "workload_style": "light" | "balanced" | "intense",
+          "reminders": boolean
+        }
+      },
+
+      "goal": {
+        "title": string,
+        "category": string,
+        "success_definition": [string],
+        "deadline": string | null
+      },
+
+      "known_facts": { key: value },
+
+      "unknowns_to_clarify": [
+        {
+          "field": string,
+          "question": string,
+          "priority": "high" | "medium"
+        }
+      ],
+
+      "assumptions_if_user_doesnt_answer": [string],
+
+      "plan": {
+        "strategy_summary": string,
+        "confidence": number,
+        "risk_flags": [string],
+        "phases": [
+          {
+            "name": string,
+            "duration_weeks": number,
+            "outcomes": [string],
+            "milestones": [string]
+          }
+        ]
+      },
+
+      "schedule_actions": [
+        {
+          "id": string,
+          "type": "task" | "event" | "review",
+          "title": string,
+          "details": string,
+          "duration_minutes": number,
+          "cadence": "one_time" | "daily" | "weekly" | "biweekly" | "monthly",
+          "preferred_days": [string],
+          "time_window_local": {
+            "start": "HH:MM",
+            "end": "HH:MM"
+          },
+          "energy_level": "low" | "medium" | "high",
+          "priority": "low" | "medium" | "high",
+          "tags": [string],
+          "success_check": string
+        }
+      ],
+
+      "sources": [
+        {
+          "title": string,
+          "url": string,
+          "why_it_matters": string
+        }
+      ]
+    }
+
+    ━━━━━━━━━━━━━━━━━━
+    FINAL DIRECTIVE
+    ━━━━━━━━━━━━━━━━━━
+
+    Your success is measured by one outcome:
+    The user clearly knows what to do next, why it matters, and can realistically follow the plan inside their life.
+
+    Always optimize for clarity, realism, and impact.
+    """
+
+    // MARK: - Generate Strategic Plan
+    func generateStrategicPlan(context: AIUserContext) async throws -> AIPlanResponse {
         guard let model = model else {
             throw GeminiError.modelNotInitialized
         }
@@ -38,160 +216,340 @@ class GeminiService: ObservableObject {
 
         defer { isGenerating = false }
 
-        let prompt = buildPrompt(category: category, responses: responses)
+        // Build the user input message
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let contextJSON = try encoder.encode(context)
+        let contextString = String(data: contextJSON, encoding: .utf8) ?? ""
+
+        let userMessage = """
+        USER CONTEXT:
+        \(contextString)
+
+        Generate a complete strategic plan following the exact JSON schema specified in your instructions.
+        Output ONLY valid JSON, no other text.
+        """
 
         do {
-            let response = try await model.generateContent(prompt)
+            // Create chat with system instruction
+            let chat = model.startChat(history: [
+                ModelContent(role: "user", parts: [.text(systemPrompt)]),
+                ModelContent(role: "model", parts: [.text("Understood. I am the AI Planning Agent. I will output only valid JSON following the exact schema. Ready to process user context.")])
+            ])
+
+            let response = try await chat.sendMessage(userMessage)
 
             guard let text = response.text else {
                 throw GeminiError.emptyResponse
             }
 
-            let events = parseEventsFromResponse(text, userId: userId, category: category)
-            return events
-        } catch {
+            // Parse the JSON response
+            let planResponse = try parseAIPlanResponse(from: text)
+            currentPlan = planResponse
+            return planResponse
+
+        } catch let error as GeminiError {
             errorMessage = error.localizedDescription
             throw error
-        }
-    }
-
-    // MARK: - Build Prompt
-    private func buildPrompt(category: GoalCategory, responses: QuestionnaireResponses) -> String {
-        let timeframeDescription: String
-        switch responses.timeframe {
-        case .oneMonth: timeframeDescription = "1 month"
-        case .threeMonths: timeframeDescription = "3 months"
-        case .sixMonths: timeframeDescription = "6 months"
-        case .oneYear: timeframeDescription = "1 year"
-        case .fiveYears: timeframeDescription = "5 years"
-        }
-
-        let preferredTimeDescription: String
-        switch responses.preferredTimeOfDay {
-        case .earlyMorning: preferredTimeDescription = "early morning (5-7 AM)"
-        case .morning: preferredTimeDescription = "morning (7 AM-12 PM)"
-        case .afternoon: preferredTimeDescription = "afternoon (12-5 PM)"
-        case .evening: preferredTimeDescription = "evening (5-9 PM)"
-        case .night: preferredTimeDescription = "night (after 9 PM)"
-        case .flexible: preferredTimeDescription = "flexible throughout the day"
-        }
-
-        return """
-        You are a personal goal achievement coach creating a detailed, actionable plan. Create a comprehensive calendar schedule for someone with the following profile:
-
-        **Category Focus:** \(category.displayName)
-        **Age:** \(responses.age)
-        **Education Level:** \(responses.educationLevel.displayName)
-        **Current Occupation:** \(responses.currentOccupation)
-        **Financial Situation:** \(responses.financialSituation.displayName)
-        **Specific Goal:** \(responses.specificGoal)
-        **Timeframe:** \(timeframeDescription)
-        **Available Hours Per Day:** \(responses.availableHoursPerDay)
-        **Preferred Time:** \(preferredTimeDescription)
-        \(responses.additionalNotes.map { "**Additional Notes:** \($0)" } ?? "")
-
-        Generate a detailed 4-week plan with daily events. Each event should be:
-        - Specific and actionable
-        - Appropriate for their education level and schedule
-        - Progressive (building on previous tasks)
-        - Varied (different types of activities)
-
-        Return the events in the following JSON format:
-        ```json
-        {
-          "events": [
-            {
-              "title": "Event title",
-              "description": "Detailed description of what to do",
-              "dayOffset": 0,
-              "startHour": 9,
-              "startMinute": 0,
-              "durationMinutes": 60,
-              "eventType": "study|workout|meditation|reading|practice|networking|financial|creative|selfCare|task|milestone",
-              "color": "hex color without #"
-            }
-          ],
-          "summary": "A brief 2-3 sentence summary of this personalized plan"
-        }
-        ```
-
-        Event types and their colors:
-        - study: 4D96FF (blue)
-        - workout: 6BCB77 (green)
-        - meditation: A8E6CF (light green)
-        - reading: 9B59B6 (purple)
-        - practice: FF6B9D (pink)
-        - networking: FF8C42 (orange)
-        - financial: 4D96FF (blue)
-        - creative: 9B59B6 (purple)
-        - selfCare: A8E6CF (light green)
-        - task: 4ECDC4 (teal)
-        - milestone: FFD93D (yellow)
-
-        Create at least 50 events spread across the 4 weeks. Include:
-        - Daily routine tasks
-        - Weekly milestones
-        - Learning sessions
-        - Practice/application time
-        - Rest and self-care moments
-        - Progress check-ins
-
-        Be specific to their goal of: \(responses.specificGoal)
-        """
-    }
-
-    // MARK: - Parse Events from Response
-    private func parseEventsFromResponse(_ text: String, userId: String, category: GoalCategory) -> [Event] {
-        var events: [Event] = []
-
-        // Extract JSON from the response
-        guard let jsonStart = text.range(of: "{"),
-              let jsonEnd = text.range(of: "}", options: .backwards) else {
-            return generateFallbackEvents(userId: userId, category: category)
-        }
-
-        let jsonString = String(text[jsonStart.lowerBound...jsonEnd.upperBound])
-
-        guard let jsonData = jsonString.data(using: .utf8) else {
-            return generateFallbackEvents(userId: userId, category: category)
-        }
-
-        do {
-            let decoder = JSONDecoder()
-            let planResponse = try decoder.decode(GeminiPlanResponse.self, from: jsonData)
-
-            let calendar = Calendar.current
-            let today = calendar.startOfDay(for: Date())
-
-            for eventData in planResponse.events {
-                var startComponents = calendar.dateComponents([.year, .month, .day], from: today)
-                startComponents.day! += eventData.dayOffset
-                startComponents.hour = eventData.startHour
-                startComponents.minute = eventData.startMinute
-
-                guard let startTime = calendar.date(from: startComponents) else { continue }
-                let endTime = calendar.date(byAdding: .minute, value: eventData.durationMinutes, to: startTime)!
-
-                let event = Event(
-                    userId: userId,
-                    title: eventData.title,
-                    description: eventData.description,
-                    startTime: startTime,
-                    endTime: endTime,
-                    eventType: EventType(rawValue: eventData.eventType) ?? .task,
-                    category: category,
-                    isAIGenerated: true,
-                    color: eventData.color
-                )
-
-                events.append(event)
-            }
         } catch {
-            print("JSON parsing error: \(error)")
-            return generateFallbackEvents(userId: userId, category: category)
+            errorMessage = error.localizedDescription
+            throw GeminiError.parsingError
+        }
+    }
+
+    // MARK: - Parse AI Plan Response
+    private func parseAIPlanResponse(from text: String) throws -> AIPlanResponse {
+        // Clean the response - remove any markdown code blocks
+        var cleanedText = text
+            .replacingOccurrences(of: "```json", with: "")
+            .replacingOccurrences(of: "```", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Find JSON boundaries
+        guard let jsonStart = cleanedText.firstIndex(of: "{"),
+              let jsonEnd = cleanedText.lastIndex(of: "}") else {
+            throw GeminiError.parsingError
+        }
+
+        cleanedText = String(cleanedText[jsonStart...jsonEnd])
+
+        guard let jsonData = cleanedText.data(using: .utf8) else {
+            throw GeminiError.parsingError
+        }
+
+        let decoder = JSONDecoder()
+        return try decoder.decode(AIPlanResponse.self, from: jsonData)
+    }
+
+    // MARK: - Convert Schedule Actions to Events
+    func convertToEvents(
+        actions: [AIScheduleAction],
+        userId: String,
+        category: GoalCategory,
+        startDate: Date = Date()
+    ) -> [Event] {
+        var events: [Event] = []
+        let calendar = Calendar.current
+
+        for action in actions {
+            let generatedEvents = generateEventsFromAction(
+                action: action,
+                userId: userId,
+                category: category,
+                startDate: startDate,
+                calendar: calendar
+            )
+            events.append(contentsOf: generatedEvents)
         }
 
         return events
+    }
+
+    private func generateEventsFromAction(
+        action: AIScheduleAction,
+        userId: String,
+        category: GoalCategory,
+        startDate: Date,
+        calendar: Calendar
+    ) -> [Event] {
+        var events: [Event] = []
+
+        // Determine how many events to create based on cadence
+        let weeksToGenerate = 4 // Generate 4 weeks of events
+        let occurrences: Int
+
+        switch action.cadence {
+        case .oneTime:
+            occurrences = 1
+        case .daily:
+            occurrences = weeksToGenerate * 7
+        case .weekly:
+            occurrences = weeksToGenerate
+        case .biweekly:
+            occurrences = weeksToGenerate / 2
+        case .monthly:
+            occurrences = 1
+        }
+
+        // Get preferred days or default to weekdays
+        let preferredDays = action.preferredDays ?? ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+
+        // Get time window or default
+        let startHour = action.timeWindowLocal?.startHour ?? 9
+        let startMinute = action.timeWindowLocal?.startMinute ?? 0
+
+        var dayOffset = 0
+        var eventsCreated = 0
+
+        while eventsCreated < occurrences && dayOffset < 60 {
+            guard let date = calendar.date(byAdding: .day, value: dayOffset, to: startDate) else {
+                dayOffset += 1
+                continue
+            }
+
+            let weekday = calendar.component(.weekday, from: date)
+            let dayName = dayNameFromWeekday(weekday)
+
+            // Check if this day matches preferred days
+            let shouldSchedule: Bool
+            switch action.cadence {
+            case .daily:
+                shouldSchedule = true
+            case .oneTime:
+                shouldSchedule = dayOffset == 0
+            default:
+                shouldSchedule = preferredDays.contains { $0.lowercased() == dayName.lowercased() }
+            }
+
+            if shouldSchedule {
+                var components = calendar.dateComponents([.year, .month, .day], from: date)
+                components.hour = startHour
+                components.minute = startMinute
+
+                if let eventStart = calendar.date(from: components) {
+                    let eventEnd = calendar.date(byAdding: .minute, value: action.durationMinutes, to: eventStart)!
+
+                    let event = Event(
+                        userId: userId,
+                        title: action.title,
+                        description: action.details,
+                        startTime: eventStart,
+                        endTime: eventEnd,
+                        eventType: eventTypeFromAction(action),
+                        category: category,
+                        isAIGenerated: true,
+                        color: colorForEnergyLevel(action.energyLevel)
+                    )
+
+                    events.append(event)
+                    eventsCreated += 1
+
+                    // For weekly/biweekly, skip appropriate days
+                    if action.cadence == .weekly {
+                        dayOffset += 6 // Will be incremented to 7 below
+                    } else if action.cadence == .biweekly {
+                        dayOffset += 13
+                    }
+                }
+            }
+
+            dayOffset += 1
+        }
+
+        return events
+    }
+
+    private func dayNameFromWeekday(_ weekday: Int) -> String {
+        switch weekday {
+        case 1: return "Sunday"
+        case 2: return "Monday"
+        case 3: return "Tuesday"
+        case 4: return "Wednesday"
+        case 5: return "Thursday"
+        case 6: return "Friday"
+        case 7: return "Saturday"
+        default: return "Monday"
+        }
+    }
+
+    private func eventTypeFromAction(_ action: AIScheduleAction) -> EventType {
+        // Map based on tags or type
+        if action.tags.contains("study") || action.tags.contains("learning") {
+            return .study
+        } else if action.tags.contains("workout") || action.tags.contains("fitness") {
+            return .workout
+        } else if action.tags.contains("meditation") || action.tags.contains("mindfulness") {
+            return .meditation
+        } else if action.tags.contains("reading") {
+            return .reading
+        } else if action.tags.contains("networking") || action.tags.contains("social") {
+            return .networking
+        } else if action.tags.contains("financial") || action.tags.contains("money") {
+            return .financial
+        } else if action.tags.contains("creative") || action.tags.contains("art") {
+            return .creative
+        } else if action.tags.contains("self-care") || action.tags.contains("rest") {
+            return .selfCare
+        } else if action.type == .review {
+            return .milestone
+        }
+        return .task
+    }
+
+    private func colorForEnergyLevel(_ level: EnergyLevel) -> String {
+        switch level {
+        case .high: return "FF6B6B"   // Red-ish for high energy
+        case .medium: return "4ECDC4" // Teal for medium
+        case .low: return "A8E6CF"    // Light green for low energy
+        }
+    }
+
+    // MARK: - Build User Context
+    static func buildContext(
+        user: User,
+        category: GoalCategory,
+        responses: QuestionnaireResponses,
+        existingEvents: [Event] = []
+    ) -> AIUserContext {
+        // Calculate hours per week from daily hours
+        let hoursPerWeek = responses.availableHoursPerDay * 7
+
+        // Determine ambition level from timeframe and hours
+        let ambitionLevel: Int
+        switch responses.timeframe {
+        case .oneMonth: ambitionLevel = 8
+        case .threeMonths: ambitionLevel = 7
+        case .sixMonths: ambitionLevel = 6
+        case .oneYear: ambitionLevel = 5
+        case .fiveYears: ambitionLevel = 4
+        }
+
+        // Build structured context
+        let structuredContext = StructuredUserContext(
+            age: responses.age,
+            educationLevel: responses.educationLevel.displayName,
+            currentOccupation: responses.currentOccupation,
+            financialSituation: responses.financialSituation.displayName,
+            selectedCategory: category.displayName,
+            specificGoal: responses.specificGoal,
+            timeframe: responses.timeframe.displayName,
+            preferredTimeOfDay: responses.preferredTimeOfDay.displayName,
+            additionalNotes: responses.additionalNotes
+        )
+
+        // Build existing events context
+        let existingEventContexts = existingEvents.prefix(20).map { event in
+            let dayFormatter = DateFormatter()
+            dayFormatter.dateFormat = "EEEE"
+            let timeFormatter = DateFormatter()
+            timeFormatter.dateFormat = "HH:mm"
+
+            return ExistingEventContext(
+                title: event.title,
+                dayOfWeek: dayFormatter.string(from: event.startTime),
+                timeSlot: timeFormatter.string(from: event.startTime),
+                durationMinutes: event.durationInMinutes
+            )
+        }
+
+        // Determine workload style
+        let workloadStyle: String
+        if hoursPerWeek <= 7 {
+            workloadStyle = "light"
+        } else if hoursPerWeek <= 14 {
+            workloadStyle = "balanced"
+        } else {
+            workloadStyle = "intense"
+        }
+
+        let preferences = UserContextPreferences(
+            workloadStyle: workloadStyle,
+            reminderPreference: user.preferences.notificationsEnabled,
+            journalFormat: user.preferences.journalFormat.displayName
+        )
+
+        return AIUserContext(
+            unstructuredInput: responses.specificGoal,
+            structuredContext: structuredContext,
+            ambitionLevel: ambitionLevel,
+            hoursPerWeek: hoursPerWeek,
+            existingEvents: Array(existingEventContexts),
+            preferences: preferences
+        )
+    }
+
+    // MARK: - Legacy Support (for existing onboarding)
+    func generatePersonalizedPlan(
+        userId: String,
+        category: GoalCategory,
+        responses: QuestionnaireResponses
+    ) async throws -> [Event] {
+        // Create a mock user for context building
+        let mockUser = User(
+            id: userId,
+            email: "",
+            displayName: "",
+            preferences: UserPreferences()
+        )
+
+        let context = GeminiService.buildContext(
+            user: mockUser,
+            category: category,
+            responses: responses
+        )
+
+        do {
+            let planResponse = try await generateStrategicPlan(context: context)
+            return convertToEvents(
+                actions: planResponse.scheduleActions,
+                userId: userId,
+                category: category
+            )
+        } catch {
+            // Fallback to basic events if AI fails
+            print("AI plan generation failed, using fallback: \(error)")
+            return generateFallbackEvents(userId: userId, category: category)
+        }
     }
 
     // MARK: - Fallback Events
@@ -200,11 +558,9 @@ class GeminiService: ObservableObject {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
 
-        // Generate basic events for 4 weeks
         for dayOffset in 0..<28 {
             guard let dayDate = calendar.date(byAdding: .day, value: dayOffset, to: today) else { continue }
 
-            // Morning task
             var morningComponents = calendar.dateComponents([.year, .month, .day], from: dayDate)
             morningComponents.hour = 9
             morningComponents.minute = 0
@@ -224,46 +580,23 @@ class GeminiService: ObservableObject {
                 ))
             }
 
-            // Evening review (every other day)
-            if dayOffset % 2 == 0 {
-                var eveningComponents = calendar.dateComponents([.year, .month, .day], from: dayDate)
-                eveningComponents.hour = 19
-                eveningComponents.minute = 0
-
-                if let eveningStart = calendar.date(from: eveningComponents) {
-                    let eveningEnd = calendar.date(byAdding: .minute, value: 30, to: eveningStart)!
-                    events.append(Event(
-                        userId: userId,
-                        title: "Progress Review",
-                        description: "Review your progress and plan for tomorrow",
-                        startTime: eveningStart,
-                        endTime: eveningEnd,
-                        eventType: .task,
-                        category: category,
-                        isAIGenerated: true,
-                        color: "FFD93D"
-                    ))
-                }
-            }
-
-            // Weekly milestone
             if dayOffset % 7 == 6 {
-                var milestoneComponents = calendar.dateComponents([.year, .month, .day], from: dayDate)
-                milestoneComponents.hour = 10
-                milestoneComponents.minute = 0
+                var reviewComponents = calendar.dateComponents([.year, .month, .day], from: dayDate)
+                reviewComponents.hour = 18
+                reviewComponents.minute = 0
 
-                if let milestoneStart = calendar.date(from: milestoneComponents) {
-                    let milestoneEnd = calendar.date(byAdding: .hour, value: 1, to: milestoneStart)!
+                if let reviewStart = calendar.date(from: reviewComponents) {
+                    let reviewEnd = calendar.date(byAdding: .minute, value: 30, to: reviewStart)!
                     events.append(Event(
                         userId: userId,
-                        title: "Weekly Milestone Check",
-                        description: "Assess your weekly progress and celebrate wins",
-                        startTime: milestoneStart,
-                        endTime: milestoneEnd,
+                        title: "Weekly Review",
+                        description: "Review your progress and plan for next week",
+                        startTime: reviewStart,
+                        endTime: reviewEnd,
                         eventType: .milestone,
                         category: category,
                         isAIGenerated: true,
-                        color: "FF6B6B"
+                        color: "FFD93D"
                     ))
                 }
             }
@@ -272,7 +605,7 @@ class GeminiService: ObservableObject {
         return events
     }
 
-    // MARK: - Check Inactivity
+    // MARK: - Inactivity Suggestion
     func generateInactivitySuggestion(
         userId: String,
         category: GoalCategory,
@@ -287,10 +620,9 @@ class GeminiService: ObservableObject {
 
         let prompt = """
         A user working on their \(category.displayName) goal hasn't been active for \(daysSinceActive) days.
-
         Their original goal was: \(originalGoal)
 
-        Write a brief, encouraging message (2-3 sentences) acknowledging they've been away, and gently suggest they might want to create a fresh plan. Be supportive, not judgmental.
+        Write a brief, encouraging message (2-3 sentences) acknowledging they've been away, and gently suggest they might want to create a fresh plan. Be supportive, not judgmental. Output only the message text.
         """
 
         let response = try await model.generateContent(prompt)
@@ -306,21 +638,28 @@ class GeminiService: ObservableObject {
         let prompt = """
         Generate 5 thoughtful journal prompts for someone working on their \(category.displayName) goals.
         The prompts should encourage reflection, self-awareness, and progress tracking.
-
-        Return as a JSON array of strings:
+        Return ONLY a JSON array of strings, no other text:
         ["prompt 1", "prompt 2", "prompt 3", "prompt 4", "prompt 5"]
         """
 
         let response = try await model.generateContent(prompt)
 
-        guard let text = response.text,
-              let jsonData = text.data(using: .utf8) else {
+        guard let text = response.text else {
+            return defaultJournalPrompts(for: category)
+        }
+
+        // Clean and parse
+        let cleanedText = text
+            .replacingOccurrences(of: "```json", with: "")
+            .replacingOccurrences(of: "```", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard let jsonData = cleanedText.data(using: .utf8) else {
             return defaultJournalPrompts(for: category)
         }
 
         do {
-            let prompts = try JSONDecoder().decode([String].self, from: jsonData)
-            return prompts
+            return try JSONDecoder().decode([String].self, from: jsonData)
         } catch {
             return defaultJournalPrompts(for: category)
         }
@@ -337,28 +676,12 @@ class GeminiService: ObservableObject {
     }
 }
 
-// MARK: - Gemini Response Models
-struct GeminiPlanResponse: Codable {
-    let events: [GeminiEventData]
-    let summary: String?
-}
-
-struct GeminiEventData: Codable {
-    let title: String
-    let description: String
-    let dayOffset: Int
-    let startHour: Int
-    let startMinute: Int
-    let durationMinutes: Int
-    let eventType: String
-    let color: String
-}
-
 // MARK: - Gemini Errors
 enum GeminiError: LocalizedError {
     case modelNotInitialized
     case emptyResponse
     case parsingError
+    case invalidContext
 
     var errorDescription: String? {
         switch self {
@@ -367,7 +690,9 @@ enum GeminiError: LocalizedError {
         case .emptyResponse:
             return "Received an empty response from AI."
         case .parsingError:
-            return "Failed to parse AI response."
+            return "Failed to parse AI response. Please try again."
+        case .invalidContext:
+            return "Invalid user context provided."
         }
     }
 }
